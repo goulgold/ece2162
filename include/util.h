@@ -5,8 +5,18 @@
  * Some Configurations.
  */
 #define MEM_SIZE 1000
-#define ARF_SIZE 20
+#define ARF_SIZE 24
 #define MAX_ALU 16 // supported maximum kind of alu
+
+#define FALSE 0
+#define TRUE 1
+
+// RS Stage
+#define ISSUE 1
+#define EXEC 2
+#define WBACK 3
+#define COMMIT 4
+
 
 // ALU type
 #define ALU_ADDI 1 // integer add/sub
@@ -35,7 +45,7 @@ struct RS_line {
     struct ROB_line *tag_2;
     float val_1;
     float val_2;
-    int stage; // 1: exec; 2: write; 3:commit
+    int stage; // 1:issue 2: exec; 3: write; 4:commit
     int cycles; // how many cycles in this stage;
 };
 
@@ -43,9 +53,11 @@ struct RS_line {
  * struct @ROB_line store all information in ONE line of ROB
  * */
 struct ROB_line {
+    int index; // index of ROB (start from 1)
     int dst; // index of ARF (start from 1)
     float val; // value of result
     int finished; // finished or not
+    int busy; // occupied or not
 };
 
 /*
@@ -56,9 +68,9 @@ struct ROB_line {
 // for all operand, float index += ARF_SIZE
 struct input_instr {
     int op; // instruction name. more details in instr.h
-    float rs; // source register
-    float rt; // target register or immediate
-    float rd; // destination register
+    int rs; // source register
+    int rt; // target register or immediate
+    int rd; // destination register
     int valid; // because instuction buffer is constructed by this struct, thus
                // I need a valid flag to whether there is a instr in buffer.
 };

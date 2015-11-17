@@ -3,7 +3,7 @@
 int getNum(char *string, int offset) {
     char s[10];
     int i = 0;
-    while (string[offset] > 47 && string[offset] < 58) {
+    while ((string[offset] > 47 && string[offset] < 58) || string[offset] == '-') {
         s[i] = string[offset];
         i++;
         offset++;
@@ -170,6 +170,11 @@ void getInstrline(char *line, struct input_instr *instr_mem, int index) {
         ret++;
         val = getNum(ret, 0);
         pinstr->rs = val + ARF_SIZE;
+    } else {
+        ret = strchr(ret, 'R');
+        ret++;
+        val = getNum(ret, 0);
+        pinstr->rs = val;
     }
     // target
     if (pinstr->op > 30000) {
@@ -194,4 +199,5 @@ void getInstrline(char *line, struct input_instr *instr_mem, int index) {
          val = getNum(ret, 0);
          pinstr->rt = val;
     }
+    pinstr->valid = 1;
 }
