@@ -4,7 +4,7 @@ CC = gcc
 SOURCE_FILES = $(wildcard *.c)
 HEAD_FILES = $(wildcard ${INCLUDE_DIR}/*.h)
 OBJ_FILES = $(patsubst %.c,%.o,${SOURCE_FILES})
-CC_FLAGS = -g -std=c99 -Wall
+CC_FLAGS = -g -std=c99 -Wall -O0
 
 all: ${PROGRAM}
 
@@ -19,6 +19,6 @@ ${OBJ_FILES} : %.o: %.c
 .PHONY : clean
 
 clean:
-	rm *.o ${PROGRAM}
+	rm -f *.o ${PROGRAM}
 
 

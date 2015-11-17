@@ -19,7 +19,7 @@
 #define SUB_D 10005 // Sub_d Fd, Fs, Ft | Fd = Fs - Ft | float sub
 #define SUBI 10006 // Subi Fd, Fs, immediate | Rd = Rs - immediate | immediate sub
 
-#define MULT 10007 // Mult_d Rd, Rs, Rt | Rd = Rs * Rt | integer multiply
+#define MULT 10007 // Mult Rd, Rs, Rt | Rd = Rs * Rt | integer multiply
 #define MULT_D 10008 // Mult_d Fd, Fs, Ft | Fd = Fs * Ft | float multiply
 
 /* ****
