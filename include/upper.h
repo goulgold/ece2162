@@ -49,6 +49,9 @@ int has_instr(struct input_instr *instr_array, int PC);
 //ROB is empty or not
 int ROB_empty(struct ROB_line *ROB, int ROB_size);
 
+// this instruction is normal or not.
+int isNormalIns(struct input_instr *instr_mem, int PC);
+
 // issue instr into RS, update RS, ROB, RAT
 int instr2RS(struct input_instr *instr_mem,
              int *PC,
@@ -57,7 +60,8 @@ int instr2RS(struct input_instr *instr_mem,
              struct ROB_line *ROB,
              int ROB_size,
              struct RAT_line *RAT,
-             int *ROB_nextfree);
+             int *ROB_nextfree,
+             float *RF);
 
 // Turn all issue instr to exec as many as possible
 // Before write back

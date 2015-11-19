@@ -21,6 +21,8 @@
 
 #define MULT 10007 // Mult Rd, Rs, Rt | Rd = Rs * Rt | integer multiply
 #define MULT_D 10008 // Mult_d Fd, Fs, Ft | Fd = Fs * Ft | float multiply
+#define DIV 10009 // Divide Rd, Rs, Rt | Rd = Rs / Rt | integer divide
+#define DIV_D 10010 // Divide.d Fd, Fs, Ft | Fd = Fs / Ft | float divide
 
 /* ****
  * 2#### : control flow instructions

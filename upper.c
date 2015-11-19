@@ -115,8 +115,8 @@ int printStatus(struct input_instr *instr_mem,
             //printf("%08x\n",(int) data_mem[i]);
     }
 
-    //print Register Station
-    printf ("Register Station:\n");
+    //print Reservation Station
+    printf ("Reservation Station:\n");
     printf ("type\tbusy\taddr\tdst\ttag1\ttag2\tval1\tval2\tstage\tcycles\n");
     for (int i = 0; i < RS_size; ++i) {
         printf("%d\t%d\n", RS[i].instr_type, RS[i].busy);
@@ -165,8 +165,6 @@ int printStatus(struct input_instr *instr_mem,
         }
     }
 
-
-
     return 0;
 }
 
@@ -188,6 +186,12 @@ int ROB_empty(struct ROB_line *ROB, int ROB_size) {
     return TRUE;
 }
 
+int isNormalIns(struct input_instr *instr_mem, int PC) {
+    //TODO
+    int op = instr_mem[PC].op;
+    return (op < BEQ);
+}
+
 int instr2RS(struct input_instr *instr_mem,
              int *PC,
              struct RS_line *RS,
@@ -195,8 +199,28 @@ int instr2RS(struct input_instr *instr_mem,
              struct ROB_line *ROB,
              int ROB_size,
              struct RAT_line *RAT,
-             int *ROB_nextfree) {
+             int *ROB_nextfree,
+             float *RF) {
     //TODO
+    struct input_instr thisInstr = instr_mem[*PC];
+    int op = instr_mem[*PC].op;
+    int alu_type = 0;
+    if (op == ADD || op == ADDI || op == SUB || op == SUBI) {
+        alu_type = ALU_ADDI;
+    } else if (op == ADD_D || op == SUB_D) {
+        alu_type = ALU_ADDD;
+    } else if (op == MULT) {
+        alu_type = ALU_MULI;
+    } else if (op == DIV) {
+        alu_type = ALU_DIVI;
+    } else if (op == MULT_D) {
+        alu_type = ALU_MULD;
+    } else if (op == DIV_D) {
+        alu_type = ALU_DIVD;
+    }
+    if (addRSROB(alu_type, thisInstr, RS, RS_size, ROB, ROB_size, ROB_nextfree, RAT, *PC, RF)) {
+        *PC++;
+    }
 }
 
 int toExec(struct RS_line *RS,

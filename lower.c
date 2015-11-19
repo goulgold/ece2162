@@ -201,3 +201,53 @@ void getInstrline(char *line, struct input_instr *instr_mem, int index) {
     }
     pinstr->valid = 1;
 }
+
+int addRSROB(int alu_type,
+             struct input_instr thisInstr,
+             struct RS_line *RS,
+             int RS_size,
+             struct ROB_line *ROB,
+             int ROB_size,
+             int *ROB_nextfree,
+             struct RAT_line *RAT,
+             int PC,
+             float *RF) {
+    int result = FALSE;
+    for (int i = 0; i < RS_size; ++i) {
+        if (RS[i].alu_type == alu_type && RS[i].busy == FALSE) {
+
+            // allocate RS instruction type
+            RS[i].instr_type = thisInstr.op;
+            RS[i].instr_addr = PC;
+
+            // allocate RS source
+            if (RAT[thisInstr.rs].tag == 0) {
+                RS[i].val_1 = RF[thisInstr.rs];
+                RS[i].tag_1 = NULL;
+            } else {
+                RS[i].tag_1 = RAT[thisInstr.rs].re_name;
+            }
+
+            // allocate RS target
+            if (thisInstr.op == ADDI || thisInstr.op == SUBI) {
+                RS[i].val_2 = thisInstr.rt;
+                RS[i].tag_2 = NULL;
+            } else {
+                if (RAT[thisInstr.rt].tag == 0) {
+                   RS[i].val_2 = RF[thisInstr.rt];
+                   RS[i].tag_2 = NULL;
+                } else {
+                    RS[i].tag_2 = RAT[thisInstr.rt].re_name;
+                }
+            }
+
+            // allocate RS destination & update RAT and ROB
+            //TODO check ROB is full or not
+            RS[i].dst = &ROB[*ROB_nextfree];
+            RAT[thisInstr.rd].tag = 1;
+            RAT[thisInstr.rd].re_name = RS[i].dst;
+            ROB[*ROB_nextfree].dst = thisInstr.rd;
+            *ROB_nextfree = (ROB_nextfree + 1) % ROB_size;
+        }
+    }
+}

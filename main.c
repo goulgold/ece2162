@@ -20,10 +20,10 @@ int main(int argc, char **argv) {
     memset(instr_mem, 0, MEM_SIZE * sizeof(struct input_instr));
     float *data_mem = (float *) malloc(MEM_SIZE * sizeof(float));
     memset(data_mem, 0, MEM_SIZE * sizeof(float));
-    float *float_RF = (float *) malloc(ARF_SIZE * sizeof(float));
-    memset(float_RF, 0, ARF_SIZE * sizeof(float));
-    int *int_RF = (int *) malloc(ARF_SIZE * sizeof(int));
-    memset(int_RF, 0, ARF_SIZE * sizeof(int));
+    float *RF = (float *) malloc(2 * ARF_SIZE * sizeof(int));
+    memset(RF, 0, 2 * ARF_SIZE * sizeof(int));
+    int *int_RF = (int *) RF;
+    float *float_RF = (float *) (RF + ARF_SIZE);
     struct RAT_line *RAT = (struct RAT_line *) malloc(2 * ARF_SIZE * sizeof(struct RAT_line));
     memset(RAT, 0, 2 * ARF_SIZE * sizeof(struct RAT_line));
     struct ROB_line *ROB;
@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
     // next commit ROB
     int ROB_nextcommit = 0;
     // next available ROB
-    int ROB_nextfree = 0;
+    int ROB_nextfree = 0; // -1 mean it's full
     // CDB
     int cdb_free = 1;
 
@@ -53,7 +53,12 @@ int main(int argc, char **argv) {
     while (has_instr(instr_mem, PC) || !ROB_empty(ROB, ROB_size)) {
 
         // 4.1 ISSUE to RS
-        instr2RS(instr_mem, &PC, RS, RS_size, ROB, ROB_size, RAT, &ROB_nextfree);
+        if (isNormalIns(instr_mem, PC)) {
+            //PC++
+        instr2RS(instr_mem, &PC, RS, RS_size, ROB, ROB_size, RAT, &ROB_nextfree, RF);
+        } else if (isBranchIns(instr_mem, PC)) {
+            //branchBackup();
+        }
 
         // 4.2 issue stage to exec stage
         // Requirement:
@@ -71,6 +76,7 @@ int main(int argc, char **argv) {
         //writeback stage to commit
         toCommit(ROB, &ROB_nextcommit, RAT, int_RF, float_RF);
 
+        addCycle(ROB, ROB_size);
         cycles++;
     }
 /*  **

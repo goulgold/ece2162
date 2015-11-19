@@ -30,3 +30,15 @@ void getInstrline(char *line, struct input_instr *instr_mem, int index);
 
 // is a Float instruction, return true
 int isFloatInstr(int op);
+
+// add a instruction into RS and update ROB RAT
+int addRSROB(int alu_type,
+             struct input_instr thisInstr,
+             struct RS_line *RS,
+             int RS_size,
+             struct ROB_line *ROB,
+             int ROB_size,
+             int *ROB_nextfree,
+             struct RAT_line *RAT,
+             int PC,
+             float *RF);

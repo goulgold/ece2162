@@ -37,14 +37,16 @@
  */
 struct RS_line {
      //TODO
-    int instr_type; // same as ALU_line
+    int alu_type; // same as ALU_line
+    int instr_type; // same as instr.h
     int busy;
     int instr_addr; // which instr is loaded.
-    struct ROB_line *dst;
-    struct ROB_line *tag_1;
-    struct ROB_line *tag_2;
-    float val_1;
-    float val_2;
+    int mem_addr; //for load/store instr
+    struct ROB_line *dst; //destination
+    struct ROB_line *tag_1; // source
+    struct ROB_line *tag_2; //target
+    float val_1; // source
+    float val_2; // target
     int stage; // 1:issue 2: exec; 3: write; 4:commit
     int cycles; // how many cycles in this stage;
 };
