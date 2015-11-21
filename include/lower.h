@@ -28,17 +28,28 @@ void getInstr(FILE *fp, struct input_instr *instr_mem);
 //given a string, update ONE instr_line
 void getInstrline(char *line, struct input_instr *instr_mem, int index);
 
+// print a ROB pointer
+void printPointROB(struct ROB_line *this_ROB);
+
 // is a Float instruction, return true
 int isFloatInstr(int op);
 
-// add a instruction into RS and update ROB RAT
-int addRSROB(int alu_type,
-             struct input_instr thisInstr,
-             struct RS_line *RS,
-             int RS_size,
-             struct ROB_line *ROB,
-             int ROB_size,
-             int *ROB_nextfree,
-             struct RAT_line *RAT,
-             int PC,
-             float *RF);
+// given a instruction, get ALU type
+int instr2ALUtype(struct input_instr this_instr);
+
+// ROB has seat or not
+int hasSeatRS(struct input_instr this_instr, struct RS_ RS);
+
+int hasSeatROB(struct ROB_ ROB);
+
+// ALU has a seat or not
+int hasSeatALU(struct RS_line *this_RS, struct ALU_ ALU);
+
+//Whether all data in this_RS is ready
+int dataReadyRS(struct RS_line *this_RS);
+
+//ISSUE stage is complete (1 cycle has passed.)
+int issueComplete(struct RS_line *this_RS, int cycles);
+
+// get result from ALU
+float getResultALU(struct RS_line *this_RS);

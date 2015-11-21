@@ -1,6 +1,16 @@
 INCLUDE_DIR = ./include
 PROGRAM = simulator
-CC = gcc
+OSNAME= $(shell uname)
+
+ifeq ($(OSNAME), Linux)
+	CC=gcc
+else ifeq ($(OSNAME), Darwin)
+	CC=clang
+else
+	echo "Use Linux or MacOS to compile, please."
+	exit
+endif
+
 SOURCE_FILES = $(wildcard *.c)
 HEAD_FILES = $(wildcard ${INCLUDE_DIR}/*.h)
 OBJ_FILES = $(patsubst %.c,%.o,${SOURCE_FILES})

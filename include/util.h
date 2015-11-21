@@ -7,11 +7,13 @@
 #define MEM_SIZE 1000
 #define ARF_SIZE 24
 #define MAX_ALU 16 // supported maximum kind of alu
+#define MAX_DISPLAY 8 // in printStatus, maximum size of one line
 
 #define FALSE 0
 #define TRUE 1
 
 // RS Stage
+#define FREE 0
 #define ISSUE 1
 #define EXEC 2
 #define WBACK 3
@@ -38,6 +40,7 @@
 struct RS_line {
      //TODO
     int alu_type; // same as ALU_line
+    int alu_index; // use which alu to exec
     int instr_type; // same as instr.h
     int busy;
     int instr_addr; // which instr is loaded.
@@ -48,8 +51,15 @@ struct RS_line {
     float val_1; // source
     float val_2; // target
     int stage; // 1:issue 2: exec; 3: write; 4:commit
-    int cycles; // how many cycles in this stage;
+    int cycles; // start cycles of this stage;
 };
+
+// Reservation Station
+struct RS_ {
+    int size;
+    struct RS_line *entity;
+};
+
 
 /*
  * struct @ROB_line store all information in ONE line of ROB
@@ -60,6 +70,13 @@ struct ROB_line {
     float val; // value of result
     int finished; // finished or not
     int busy; // occupied or not
+};
+
+struct ROB_ {
+    int size;
+    int nextcommit;
+    int nextfree;
+    struct ROB_line *entity;
 };
 
 /*
@@ -79,7 +96,7 @@ struct input_instr {
 
 // Register alias table
 struct RAT_line {
-    int tag; // 0: integer register file; 1: float register file; 2: ROB
+    int tag; // 0: register file; 1: ROB
     struct ROB_line *re_name; // reference to ROB if tag = 2
 };
 
@@ -91,6 +108,11 @@ struct ALU_line {
     int mem_cycle; // how much cycles mem takes
     int busy; // this ALU is busy or not
 
+};
+
+struct ALU_ {
+    int size;
+    struct ALU_line *entity;
 };
 
 #endif

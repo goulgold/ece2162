@@ -4,6 +4,7 @@
 #include "instr.h"
 #include "lower.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 /*
  * function @ parse_file read files and initialize all parameters
@@ -17,14 +18,11 @@
 int Parse_File(char *file_name,
                struct input_instr *instr_mem,
                float *data_mem,
-               struct RS_line **RS,
-               int *RS_size,
-               float *float_RF,
+               struct RS_ *RS,
                int *int_RF,
-               struct ROB_line **ROB,
-               int *ROB_size,
-               struct ALU_line **ALU,
-               int *ALU_size);
+               float *float_RF,
+               struct ROB_ *ROB,
+               struct ALU_ *ALU);
 
 /*
  * function @printStatus print all information
@@ -33,15 +31,13 @@ int Parse_File(char *file_name,
 
 int printStatus(struct input_instr *instr_mem,
                 float *data_mem,
-                struct RS_line *RS,
-                int RS_size,
+                struct RS_ *RS,
                 float *float_RF,
                 int *int_RF,
-                struct ROB_line *ROB,
-                int ROB_size,
-                struct ALU_line *ALU,
-                int ALU_size,
-                struct RAT_line *RAT);
+                struct ROB_ *ROB,
+                struct ALU_ *ALU,
+                struct RAT_line *RAT,
+                int cycles);
 
 //PC pointer's location, has a instr or not
 int has_instr(struct input_instr *instr_array, int PC);
@@ -50,39 +46,38 @@ int has_instr(struct input_instr *instr_array, int PC);
 int ROB_empty(struct ROB_line *ROB, int ROB_size);
 
 // this instruction is normal or not.
-int isNormalIns(struct input_instr *instr_mem, int PC);
+int isALUIns(struct input_instr instr_mem);
 
-// issue instr into RS, update RS, ROB, RAT
-int instr2RS(struct input_instr *instr_mem,
-             int *PC,
-             struct RS_line *RS,
-             int RS_size,
-             struct ROB_line *ROB,
-             int ROB_size,
+// issue instr into RS, update RS, ROB, RAT, ALU
+int issueALU(struct input_instr this_instr,
+             struct RS_ RS,
+             struct ROB_ ROB,
              struct RAT_line *RAT,
-             int *ROB_nextfree,
-             float *RF);
+             int *int_RF,
+             float *float_RF,
+             int cycles);
+
+
 
 // Turn all issue instr to exec as many as possible
 // Before write back
-int toExec(struct RS_line *RS,
-           int RS_size,
-           struct ALU_line *ALU,
-           int ALU_size,
-           struct ROB_line *ROB,
-           int ROB_size);
-// Turn all exec complete instr to wback
-int toWback(struct RS_line *RS,
-        int RS_size,
-        struct ALU_line *ALU,
-        int ALU_size,
-        struct ROB_line *ROB,
-        int ROB_size,
-        int cdb_free);
+int startExecALU(struct RS_line *this_RS,
+                 struct ALU_ ALU,
+                 int cycles);
 
+// whether this_RS is exec complete or not
+int exeCompleteALU(struct RS_line *this_RS, struct ALU_ ALU, int cycles);
 
-int toCommit(struct ROB_line *ROB,
-             int *ROB_nextcommit,
+// Turn this exec complete instr to wback
+int startWback(struct RS_line *this_RS,
+        struct RS_ RS,
+        struct ALU_ ALU,
+        struct ROB_ ROB,
+        int cycles);
+
+int readyCommitROB(struct ROB_line this_ROB);
+
+int startCommit(struct ROB_line *this_ROB,
              struct RAT_line *RAT,
              int *int_RF,
              float *float_RF);

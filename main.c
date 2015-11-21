@@ -12,110 +12,109 @@ int main(int argc, char **argv) {
     }
     // 1.1 Initialize all parameters and allocate memory, (some memory are allocated in Parse_File())
     char *file_name = argv[1];
-    struct RS_line *RS; // register station
-    int RS_size;
-    struct ALU_line *ALU;
-    int ALU_size;
+    struct RS_ RS; // register station
+    struct ALU_ ALU;
+    struct ROB_ ROB;
+
+    //Memory allocation
     struct input_instr *instr_mem = (struct input_instr *) malloc(MEM_SIZE * sizeof(struct input_instr));
     memset(instr_mem, 0, MEM_SIZE * sizeof(struct input_instr));
     float *data_mem = (float *) malloc(MEM_SIZE * sizeof(float));
     memset(data_mem, 0, MEM_SIZE * sizeof(float));
+
+    //RF allocation
     float *RF = (float *) malloc(2 * ARF_SIZE * sizeof(int));
     memset(RF, 0, 2 * ARF_SIZE * sizeof(int));
     int *int_RF = (int *) RF;
     float *float_RF = (float *) (RF + ARF_SIZE);
     struct RAT_line *RAT = (struct RAT_line *) malloc(2 * ARF_SIZE * sizeof(struct RAT_line));
     memset(RAT, 0, 2 * ARF_SIZE * sizeof(struct RAT_line));
-    struct ROB_line *ROB;
-    int ROB_size;
+
     int cycles = 0;
     int PC = 0;
-    // next commit ROB
-    int ROB_nextcommit = 0;
-    // next available ROB
-    int ROB_nextfree = 0; // -1 mean it's full
     // CDB
     int cdb_free = 1;
+    // whether need next cycle or not
+    int done = FALSE;
 
     // 2.parse arguments load instr to memory
     // 3.initialize： RS, ROB, ARF, Timing Table, Memory
-    if (Parse_File(file_name, instr_mem, data_mem, &RS, &RS_size, float_RF, int_RF, &ROB, &ROB_size, &ALU, &ALU_size)) {
+    // next available ROB
+    if (Parse_File(file_name, instr_mem, data_mem, &RS, int_RF, float_RF, &ROB, &ALU)) {
          printf("Read file failed.\n");
          exit(1);
     }
     //DEBUG: print status
-    if (printStatus(instr_mem, data_mem, RS, RS_size, float_RF, int_RF, ROB, ROB_size, ALU, ALU_size, RAT)) {
+    if (printStatus(instr_mem, data_mem, &RS, float_RF, int_RF, &ROB, &ALU, RAT,cycles)) {
         printf("Print Status failed.\n");
         exit(1);
     }
 
-    // 4.Start simulate until PC point to NULL
-    while (has_instr(instr_mem, PC) || !ROB_empty(ROB, ROB_size)) {
-
+    // 4.Start simulate until no more cycle is needed.
+    //
+    //
+    //
+    while (!done) {
+        cycles++;
+        done = TRUE;
         // 4.1 ISSUE to RS
-        if (isNormalIns(instr_mem, PC)) {
-            //PC++
-        instr2RS(instr_mem, &PC, RS, RS_size, ROB, ROB_size, RAT, &ROB_nextfree, RF);
-        } else if (isBranchIns(instr_mem, PC)) {
-            //branchBackup();
+        if (has_instr(instr_mem, PC)) {
+            done = FALSE;
+            struct input_instr this_instr = instr_mem[PC];
+            // ALU instructions
+            if (isALUIns(this_instr)) {
+                if (issueALU(this_instr, RS, ROB, RAT, int_RF, float_RF, cycles)) {
+                    ROB.nextfree = (ROB.nextfree + 1 + ROB.size) % ROB.size;
+                    PC++;
+                }
+            } else {
+                printf("unknown instruction: %d\n" ,this_instr.op);
+                exit(1);
+            }
+
         }
 
-        // 4.2 issue stage to exec stage
+        // 4.2 start exec stage
         // Requirement:
         // 1.issue exe 1 cycle
         // 2.have room in ALU
         // 3.all data are ready
-        toExec(RS, RS_size, ALU, ALU_size, ROB, ROB_size);
+        for (int i = 0; i < RS.size; ++i) {
+            struct RS_line *this_RS = &RS.entity[i];
+            startExecALU(this_RS, ALU, cycles);
+        }
 
-        //exec stage to writeback
+        //start commit
+        //Requirement:
+        //next commit header to ROB's is finished
+        if (readyCommitROB(ROB.entity[ROB.nextcommit])) {
+            done = FALSE;
+            startCommit(&ROB.entity[ROB.nextcommit], RAT, int_RF, float_RF);
+            ROB.nextcommit = (ROB.nextcommit + 1 + ROB.size) % ROB.size;
+        }
+
+        //start writeback
         //Requirement:
         //1.exec is complete
         //2.cdb is free (?)
-        toWback(RS, RS_size, ALU, ALU_size, ROB, ROB_size, cdb_free);
-
-        //writeback stage to commit
-        toCommit(ROB, &ROB_nextcommit, RAT, int_RF, float_RF);
-
-        addCycle(ROB, ROB_size);
-        cycles++;
-    }
-/*  **
-    while (has_next(instr_array) || not_empty(ROB)) {
-
-        get next_instr;
-
-        // insert this instr into RS and update RAT & ROB
-        if (has_seat(RS, next_instr) && has_seat(ROB, next_instr)) {
-
-            // use RAT to update instr
-            if (operandof(next_instr) is in ARF) {
-                load value directly.
-            } else {
-                 load ROB location.
+        for (int i = 0; i < RS.size; ++i) {
+            struct RS_line *this_RS = &RS.entity[i];
+            if (exeCompleteALU(this_RS, ALU, cycles) && cdb_free) {
+                done = FALSE;
+                cdb_free = FALSE;
+                // actually, the result is write back in this cycles
+                startWback(this_RS, RS, ALU, ROB, cycles);
             }
-            // insert this instr into RS
-            insert(next_instr, RS);
-            // update ROB & RAT
-            update dest of next_instr in RAT.
-            update dest of next_instr in ROB.
         }
+        cdb_free = TRUE;
 
-        //update all buffer in this function
-        add_cycle(RS)
-            if (any_instr in RS ready to exec) {
-                start_exec(this_instr);
-            }
-            if (any_instr in RS ready to write back && CDB is free) {
-                start_writeback(this_instr);
-            }
-            if (write back in CDB is complete) {
-                update ROB;
-                remove this instr from RS;
-                update RS waiting for this result;
-            }
-
+        //print current status
+        printStatus(instr_mem, data_mem, &RS, float_RF, int_RF, &ROB, &ALU, RAT,cycles);
+        printf("Press ENTER to continue.\n");
+        getchar();
     }
-    **/
+
+
     return 0;
 }
 

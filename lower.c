@@ -202,52 +202,122 @@ void getInstrline(char *line, struct input_instr *instr_mem, int index) {
     pinstr->valid = 1;
 }
 
-int addRSROB(int alu_type,
-             struct input_instr thisInstr,
-             struct RS_line *RS,
-             int RS_size,
-             struct ROB_line *ROB,
-             int ROB_size,
-             int *ROB_nextfree,
-             struct RAT_line *RAT,
-             int PC,
-             float *RF) {
-    int result = FALSE;
-    for (int i = 0; i < RS_size; ++i) {
-        if (RS[i].alu_type == alu_type && RS[i].busy == FALSE) {
+int instr2ALUtype(struct input_instr this_instr) {
+    int result;
+    int op = this_instr.op;
+    switch(op) {
+        case ADD:
+            result = ALU_ADDI;
+            break;
+        case ADD_D:
+            result = ALU_ADDD;
+            break;
+        case ADDI:
+            result = ALU_ADDI;
+            break;
+        case SUB:
+            result = ALU_ADDI;
+            break;
+        case SUB_D:
+            result = ALU_ADDD;
+            break;
+        case SUBI:
+            result = ALU_ADDD;
+            break;
+        case MULT:
+            result = ALU_MULI;
+            break;
+        case MULT_D:
+            result = ALU_MULD;
+            break;
+        case DIV:
+            result = ALU_DIVI;
+            break;
+        case DIV_D:
+            result = ALU_DIVD;
+            break;
+        default:
+            result = -1;
+            break;
+    }
+    return result;
+}
 
-            // allocate RS instruction type
-            RS[i].instr_type = thisInstr.op;
-            RS[i].instr_addr = PC;
-
-            // allocate RS source
-            if (RAT[thisInstr.rs].tag == 0) {
-                RS[i].val_1 = RF[thisInstr.rs];
-                RS[i].tag_1 = NULL;
-            } else {
-                RS[i].tag_1 = RAT[thisInstr.rs].re_name;
-            }
-
-            // allocate RS target
-            if (thisInstr.op == ADDI || thisInstr.op == SUBI) {
-                RS[i].val_2 = thisInstr.rt;
-                RS[i].tag_2 = NULL;
-            } else {
-                if (RAT[thisInstr.rt].tag == 0) {
-                   RS[i].val_2 = RF[thisInstr.rt];
-                   RS[i].tag_2 = NULL;
-                } else {
-                    RS[i].tag_2 = RAT[thisInstr.rt].re_name;
-                }
-            }
-
-            // allocate RS destination & update RAT and ROB
-            //TODO check ROB is full or not
-            RS[i].dst = &ROB[*ROB_nextfree];
-            RAT[thisInstr.rd].tag = 1;
-            RAT[thisInstr.rd].re_name = RS[i].dst;
-            ROB[*ROB_nextfree].dst = thisInstr.rd;
-            *ROB_nextfree = (ROB_nextfree + 1) % ROB_size;
+int hasSeatRS(struct input_instr this_instr, struct RS_ RS) {
+    int this_alutype = instr2ALUtype(this_instr);
+    for (int i = 0; i < RS.size; ++i) {
+        if (RS.entity[i].alu_type == this_alutype && RS.entity[i].busy == FALSE) {
+            return i;
         }
+    }
+    return -1;
+}
+
+int hasSeatROB(struct ROB_ ROB) {
+    if (ROB.entity[ROB.nextfree].busy == FALSE)
+        return TRUE;
+    else
+        return FALSE;
+}
+
+int dataReadyRS(struct RS_line *this_RS) {
+    if (this_RS->tag_1 == NULL && this_RS->tag_2 == NULL) {
+        return TRUE;
+    } else {
+        return FALSE;
+    }
+}
+
+int issueComplete(struct RS_line *this_RS, int cycles) {
+    if (cycles - this_RS->cycles > 0) {
+        return TRUE;
+    } else {
+        return FALSE;
+    }
+}
+
+int hasSeatALU(struct RS_line *this_RS, struct ALU_ ALU) {
+    for (int i = 0; i < ALU.size; ++i) {
+        if (ALU.entity[i].type == this_RS->alu_type && ALU.entity[i].busy == FALSE)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+float getResultALU(struct RS_line *this_RS) {
+    //TODO
+    int alu_type = this_RS->alu_type;
+    float result;
+    switch(alu_type) {
+        case ALU_ADDI:
+            result = this_RS->val_1 + this_RS->val_2;
+            break;
+        case ALU_MULI:
+            result = this_RS->val_1 * this_RS->val_2;
+            break;
+        case ALU_DIVI:
+            result = this_RS->val_1 / this_RS->val_2;
+            break;
+        case ALU_ADDD:
+            result = this_RS->val_1 + this_RS->val_2;
+            break;
+        case ALU_MULD:
+            result = this_RS->val_1 * this_RS->val_2;
+            break;
+        case ALU_DIVD:
+            result = this_RS->val_1 / this_RS->val_2;
+            break;
+        default:
+            result = 0.0;
+            break;
+    }
+    return result;
+}
+
+void printPointROB(struct ROB_line *this_ROB) {
+    if (this_ROB == NULL) {
+        printf("null\t");
+    } else {
+        printf("%d\t", this_ROB->index);
     }
 }
