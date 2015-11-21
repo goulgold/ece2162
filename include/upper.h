@@ -81,4 +81,6 @@ int startCommit(struct ROB_line *this_ROB,
              struct RAT_line *RAT,
              int *int_RF,
              float *float_RF);
+
+int notFinishROB(struct ROB_line *this_ROB);
 #endif

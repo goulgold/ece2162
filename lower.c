@@ -279,9 +279,9 @@ int issueComplete(struct RS_line *this_RS, int cycles) {
 int hasSeatALU(struct RS_line *this_RS, struct ALU_ ALU) {
     for (int i = 0; i < ALU.size; ++i) {
         if (ALU.entity[i].type == this_RS->alu_type && ALU.entity[i].busy == FALSE)
-            return TRUE;
+        return i;
     }
-    return FALSE;
+    return -1;
 }
 
 float getResultALU(struct RS_line *this_RS) {

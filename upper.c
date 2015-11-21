@@ -56,6 +56,7 @@ int Parse_File(char *file_name,
             ALU->entity[index].type = alu_type[i];
             ALU->entity[index].exec_cycle = cyc_ex[i];
             ALU->entity[index].mem_cycle = cyc_mem[i];
+            index++;
         }
     }
 
@@ -116,7 +117,7 @@ int printStatus(struct input_instr *instr_mem,
 
     //print Reservation Station
     printf ("Reservation Station:\n");
-    printf ("type\tbusy\tdst\ttag1\ttag2\tval1\tval2\tcycles\n");
+    printf ("type\tbusy\tdst\ttag1\ttag2\tval1\tval2\tcycles\tstage\n");
     for (int i = 0; i < RS->size; ++i) {
         printf("%d\t%d\t", RS->entity[i].instr_type, RS->entity[i].busy);
         printPointROB(RS->entity[i].dst);
@@ -125,6 +126,7 @@ int printStatus(struct input_instr *instr_mem,
         printf("%f\t", RS->entity[i].val_1);
         printf("%f\t", RS->entity[i].val_2);
         printf("%d\t", RS->entity[i].cycles);
+        printf("%d\t", RS->entity[i].stage);
         printf("\n");
 
     }
@@ -313,6 +315,7 @@ int startWback(struct RS_line *this_RS,
     this_RS->dst->finished = TRUE;
     // update this_RS to free
     this_RS->stage = WBACK;
+    this_RS->cycles = cycles;
     this_RS->busy = FALSE;
     // update all other RS
     for (int i = 0; i < RS.size; ++i) {
@@ -359,3 +362,10 @@ int startCommit(struct ROB_line *this_ROB,
     return TRUE;
 }
 
+int notFinishROB(struct ROB_line *this_ROB) {
+    if (this_ROB->busy == TRUE) {
+        return TRUE;
+    } else {
+        return FALSE;
+    }
+}

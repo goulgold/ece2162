@@ -57,6 +57,15 @@ int main(int argc, char **argv) {
     while (!done) {
         cycles++;
         done = TRUE;
+
+        // if ROB is busy, continue
+        for (int i =0; i < ROB.size; ++i) {
+            if (notFinishROB(&ROB.entity[i])) {
+                done = FALSE;
+                break;
+            }
+        }
+
         // 4.1 ISSUE to RS
         if (has_instr(instr_mem, PC)) {
             done = FALSE;
@@ -112,6 +121,7 @@ int main(int argc, char **argv) {
         printStatus(instr_mem, data_mem, &RS, float_RF, int_RF, &ROB, &ALU, RAT,cycles);
         printf("Press ENTER to continue.\n");
         getchar();
+
     }
 
 
