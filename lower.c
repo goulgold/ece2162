@@ -3,6 +3,7 @@
 int getNum(char *string, int offset) {
     char s[10];
     int i = 0;
+    while (string[offset] == ' ') offset++;
     while ((string[offset] > 47 && string[offset] < 58) || string[offset] == '-') {
         s[i] = string[offset];
         i++;
