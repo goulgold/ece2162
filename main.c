@@ -10,12 +10,13 @@ int main(int argc, char **argv) {
 
     // 1.test arguments is valid or not
     //
-    if (argc != 2) {
-        printf("Usage: %s <input_file>\n", argv[0]);
+    if (argc != 3) {
+        printf("Usage: %s <input_file> <global configuration file>\n", argv[0]);
         exit(1);
     }
     // 1.1 Initialize all parameters and allocate memory, (some memory are allocated in Parse_File())
-    char *file_name = argv[1];
+    char *input_file_name = argv[1];
+    char *conf_file_name = argv[2];
     struct RS_ RS; // register station
     struct ALU_ ALU;
     struct ROB_ ROB;
@@ -46,7 +47,7 @@ int main(int argc, char **argv) {
     // 2.parse arguments load instr to memory
     // 3.initialize： RS, ROB, ARF, Timing Table, Memory
     // next available ROB
-    if (Parse_File(file_name, instr_mem, data_mem, &RS, int_RF, float_RF, &ROB, &ALU)) {
+    if (Parse_File(input_file_name, conf_file_name, instr_mem, data_mem, &RS, int_RF, float_RF, &ROB, &ALU)) {
          printf("Read file failed.\n");
          exit(1);
     }
@@ -124,11 +125,14 @@ int main(int argc, char **argv) {
         cdb_free = TRUE;
 
         //print current status
-        printStatus(instr_mem, data_mem, &RS, float_RF, int_RF, &ROB, &ALU, RAT,cycles);
+        //printStatus(instr_mem, data_mem, &RS, float_RF, int_RF, &ROB, &ALU, RAT,cycles);
+        /*
         printf("Press ENTER to continue.\n");
         getchar();
+        */
 
     }
+    printStatus(instr_mem, data_mem, &RS, float_RF, int_RF, &ROB, &ALU, RAT,cycles);
 
     // print Timing Table
     printTimetable();

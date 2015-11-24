@@ -15,7 +15,8 @@
  * TODO
  */
 
-int Parse_File(char *file_name,
+int Parse_File(char *input_file_name,
+               char *conf_file_name,
                struct input_instr *instr_mem,
                float *data_mem,
                struct RS_ *RS,

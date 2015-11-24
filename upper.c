@@ -4,7 +4,8 @@
 extern struct timetable_line *TimeTable;
 extern int table_index;
 
-int Parse_File(char *file_name,
+int Parse_File(char *input_file_name,
+               char *conf_file_name,
                struct input_instr *instr_mem,
                float *data_mem,
                struct RS_ *RS,
@@ -12,9 +13,9 @@ int Parse_File(char *file_name,
                float *float_RF,
                struct ROB_ *ROB,
                struct ALU_ *ALU) {
-    // Open file
+    // Open global conf file
     FILE *fp;
-    fp = fopen(file_name, "r");
+    fp = fopen(conf_file_name, "r");
     if (fp == NULL) return -1;
 
     //ignore the first line.
@@ -73,15 +74,22 @@ int Parse_File(char *file_name,
         ROB->entity[i].index = i+1;
     }
     ROB->nextfree = 0;
+    fclose(fp);
+
+    fp = fopen(input_file_name, "r");
+    if (fp == NULL) return -1;
 
     //start read Integer RF & Float RF
     fgets(line, 100, fp);
-    getIRF(line, int_RF);
-    getFRF(line, float_RF);
+    if (!getIRF(line, int_RF) && !getFRF(line, float_RF)) {
+        fseek(fp, 0, SEEK_SET);
+    }
 
     //start read Memory information
     fgets(line, 100, fp);
-    getMem(line, data_mem);
+    if (!getMem(line, data_mem)) {
+        fseek(fp, 0, SEEK_SET);
+    }
 
     //start read instruction information
     getInstr(fp, instr_mem);
@@ -114,12 +122,15 @@ int printStatus(struct input_instr *instr_mem,
     }
 
     //print Data memory;
+    /*
     printf("Data memory:\n");
     for (int i = 0; i < MEM_SIZE; ++i) {
-            //printf("%08x\n",(int) data_mem[i]);
+        printf("%08x\n",(int) data_mem[i]);
     }
+    */
 
     //print Reservation Station
+    /*
     printf ("Reservation Station:\n");
     printf ("type\tbusy\tdst\ttag1\ttag2\tval1\tval2\tcycles\tstage\n");
     for (int i = 0; i < RS->size; ++i) {
@@ -134,8 +145,10 @@ int printStatus(struct input_instr *instr_mem,
         printf("\n");
 
     }
+    */
 
     //print Integer Register File (RF)
+    printf("Register File:\n");
     for (int i = 0; i < ARF_SIZE; ++i) {
         printf("R%d: %d\t", i, int_RF[i]);
         if ((i+1) % MAX_DISPLAY == 0)
@@ -151,6 +164,7 @@ int printStatus(struct input_instr *instr_mem,
 
     //print RAT
     //Integer
+    /*
     printf ("IRAT:\n");
     for (int i = 0; i < ARF_SIZE; ++i) {
         if (RAT[i].tag == 0)
@@ -170,8 +184,10 @@ int printStatus(struct input_instr *instr_mem,
         if ((i+1) % MAX_DISPLAY == 0)
             printf("\n");
     }
+    */
 
     //Re-order Buffer (ROB)
+    /*
     printf ("ROB:\n");
     printf ("index\tbusy\tdes\tval\tfinished\n");
     for (int i = 0; i < ROB->size; ++i) {
@@ -183,7 +199,7 @@ int printStatus(struct input_instr *instr_mem,
                     ROB->entity[i].finished);
             printf("\n");
     }
-
+    */
     return 0;
 }
 

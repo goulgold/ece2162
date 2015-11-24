@@ -16,11 +16,11 @@ int getMemcyc(char *line);
 int getFunum(char *line);
 
 //given a string, update Integer RF and Float RF
-void getIRF(char *line, int *int_RF);
-void getFRF(char *line, float *float_RF);
+int getIRF(char *line, int *int_RF);
+int getFRF(char *line, float *float_RF);
 
 //given a string, update Memory
-void getMem(char *line, float *data_mem);
+int getMem(char *line, float *data_mem);
 
 //given a file pointer, update instr_mem
 void getInstr(FILE *fp, struct input_instr *instr_mem);

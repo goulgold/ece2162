@@ -56,11 +56,12 @@ int getFunum(char *line) {
     return getNum(line, 64);
 }
 
-void getIRF(char *line, int *int_RF) {
+int getIRF(char *line, int *int_RF) {
     char *ret;
     int index;
     int val;
     ret = strchr(line, 'R');
+    if (!ret) return FALSE;
     while (ret != NULL) {
         ret++;
         index = getNum(ret, 0);
@@ -71,13 +72,15 @@ void getIRF(char *line, int *int_RF) {
         ret = strchr(ret, 'R');
         //printf("%s\n", ret);
     }
+    return TRUE;
 }
 
-void getFRF(char *line, float *float_RF) {
+int getFRF(char *line, float *float_RF) {
     char *ret;
     int index;
     float val;
     ret = strchr(line, 'F');
+    if (!ret) return FALSE;
     while (ret != NULL) {
         ret++;
         index = getNum(ret, 0);
@@ -87,13 +90,15 @@ void getFRF(char *line, float *float_RF) {
         float_RF[index] = val;
         ret = strchr(ret, 'F');
     }
+    return TRUE;
 }
 
-void getMem(char *line, float *data_mem) {
+int getMem(char *line, float *data_mem) {
     char *ret;
     int index;
     float val;
     ret = strstr(line, "Mem");
+    if (!ret) return FALSE;
     while (ret != NULL) {
         ret += 4;
         index = getNum(ret, 0);
@@ -103,6 +108,7 @@ void getMem(char *line, float *data_mem) {
         data_mem[index / 4] = val;
         ret = strstr(ret, "Mem");
     }
+    return TRUE;
 }
 
 void getInstr(FILE *fp, struct input_instr *instr_mem) {
