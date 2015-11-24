@@ -80,7 +80,8 @@ int readyCommitROB(struct ROB_line this_ROB);
 int startCommit(struct ROB_line *this_ROB,
              struct RAT_line *RAT,
              int *int_RF,
-             float *float_RF);
+             float *float_RF,
+             int cycles);
 
 int notFinishROB(struct ROB_line *this_ROB);
 #endif

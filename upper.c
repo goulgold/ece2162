@@ -1,4 +1,8 @@
 #include "upper.h"
+#include "timingtable.h"
+
+extern struct timetable_line *TimeTable;
+extern int table_index;
 
 int Parse_File(char *file_name,
                struct input_instr *instr_mem,
@@ -218,6 +222,12 @@ int issueALU(struct input_instr this_instr,
     if (seatRS == -1 || !hasSeatROB(ROB))
         return FALSE;
 
+    // update timing table
+    startISSUEtable(table_index, cycles);
+    RS.entity[seatRS].ttable_index = table_index;
+    TimeTable[table_index].index = table_index;
+    table_index++;
+
     // allocate RS information
     RS.entity[seatRS].instr_type = this_instr.op;
     RS.entity[seatRS].busy = TRUE;
@@ -277,6 +287,9 @@ int startExecALU(struct RS_line *this_RS,
         seatALU != -1 &&
         this_RS->stage == ISSUE) {
 
+        //update timing table
+        startEXECtable(this_RS->ttable_index, cycles);
+
         //update RS
         this_RS->stage = EXEC;
         this_RS->cycles = cycles;
@@ -311,8 +324,11 @@ int startWback(struct RS_line *this_RS,
     // update alu to free
     ALU.entity[this_RS->alu_index].busy = FALSE;
     // update ROB
+    this_RS->dst->ttable_index = this_RS->ttable_index;
     this_RS->dst->val = result;
     this_RS->dst->finished = TRUE;
+    // update timing table
+    startWBtable(this_RS->ttable_index, cycles);
     // update this_RS to free
     this_RS->stage = WBACK;
     this_RS->cycles = cycles;
@@ -342,8 +358,11 @@ int readyCommitROB(struct ROB_line this_ROB) {
 int startCommit(struct ROB_line *this_ROB,
     struct RAT_line *RAT,
              int *int_RF,
-             float *float_RF) {
+             float *float_RF,
+             int cycles) {
      //TODO
+    // update timing table
+    startCOMMITtable(this_ROB->ttable_index, cycles);
     //update ROB
     this_ROB->busy = FALSE;
     this_ROB->finished = FALSE;

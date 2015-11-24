@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include "upper.h"
+#include "timingtable.h"
 #include <stdlib.h>
+
+extern struct timetable_line *TimeTable;
+extern int table_index;
 
 int main(int argc, char **argv) {
 
@@ -17,6 +21,8 @@ int main(int argc, char **argv) {
     struct ROB_ ROB;
 
     //Memory allocation
+    TimeTable = (struct timetable_line *) malloc (MAX_TTABLE_LINE * sizeof(struct timetable_line));
+    memset(TimeTable, 0, MAX_TTABLE_LINE * sizeof(struct timetable_line));
     struct input_instr *instr_mem = (struct input_instr *) malloc(MEM_SIZE * sizeof(struct input_instr));
     memset(instr_mem, 0, MEM_SIZE * sizeof(struct input_instr));
     float *data_mem = (float *) malloc(MEM_SIZE * sizeof(float));
@@ -98,7 +104,7 @@ int main(int argc, char **argv) {
         //next commit header to ROB's is finished
         if (readyCommitROB(ROB.entity[ROB.nextcommit])) {
             done = FALSE;
-            startCommit(&ROB.entity[ROB.nextcommit], RAT, int_RF, float_RF);
+            startCommit(&ROB.entity[ROB.nextcommit], RAT, int_RF, float_RF,cycles);
             ROB.nextcommit = (ROB.nextcommit + 1 + ROB.size) % ROB.size;
         }
 
@@ -124,6 +130,8 @@ int main(int argc, char **argv) {
 
     }
 
+    // print Timing Table
+    printTimetable();
 
     return 0;
 }

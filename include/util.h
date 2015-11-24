@@ -52,6 +52,7 @@ struct RS_line {
     float val_2; // target
     int stage; // 1:issue 2: exec; 3: write; 4:commit
     int cycles; // start cycles of this stage;
+    int ttable_index; // timing table index
 };
 
 // Reservation Station
@@ -66,6 +67,7 @@ struct RS_ {
  * */
 struct ROB_line {
     int index; // index of ROB (start from 1)
+    int ttable_index; // timing table index
     int dst; // index of ARF (start from 1)
     float val; // value of result
     int finished; // finished or not
