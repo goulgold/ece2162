@@ -12,12 +12,13 @@
 #define FALSE 0
 #define TRUE 1
 
-// RS Stage
+// RS LSQ Stage
 #define FREE 0
 #define ISSUE 1
 #define EXEC 2
-#define WBACK 3
-#define COMMIT 4
+#define MEM 3
+#define WBACK 4
+#define COMMIT 5
 
 
 // ALU type
@@ -44,7 +45,6 @@ struct RS_line {
     int instr_type; // same as instr.h
     int busy;
     int instr_addr; // which instr is loaded.
-    int mem_addr; //for load/store instr
     struct ROB_line *dst; //destination
     struct ROB_line *tag_1; // source
     struct ROB_line *tag_2; //target
@@ -99,7 +99,7 @@ struct input_instr {
 // Register alias table
 struct RAT_line {
     int tag; // 0: register file; 1: ROB
-    struct ROB_line *re_name; // reference to ROB if tag = 2
+    struct ROB_line *re_name; // reference to ROB if tag = 1
 };
 
 // ALU function unit
@@ -116,5 +116,44 @@ struct ALU_ {
     int size;
     struct ALU_line *entity;
 };
+
+struct LsQueue_line {
+    int busy;
+    int finished;
+    int exec_cycle;
+    int mem_cycle;
+    int instr_type;
+    int alu_type;
+    int mem_addr;
+    float mem_val;
+    struct ROB_line *dst;
+    struct ROB_line *tag_1; //base addr
+    int offset; // offset addr
+    int stage;
+    int cycle; // which cycle this stage begins
+    int ttable_index;
+};
+
+struct LsQueue {
+    struct LsQueue_line *entity;
+    int head;
+    int tail;
+    int size;
+};
+
+/* ***************************
+ * Some util functions
+ * **************************/
+
+int notFinishROB(struct ROB_line *this_ROB);
+
+// is a Float instruction, return true
+int isFloatInstr(int op);
+
+// is a sub instruction, return true
+int isSubInstr(int op);
+
+// given a instruction, get ALU type
+int instr2ALUtype(struct input_instr this_instr);
 
 #endif
