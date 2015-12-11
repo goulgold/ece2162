@@ -1,0 +1,20 @@
+main:
+        addi R2, R0, 10         //R2 = 10
+l_0:    
+        addi R5, R0, 1          //R5 = 1
+        bne R2, R5, l_1         //R2 != R5, branch taken
+        addi R10, R0, 3840      //should not reach here
+        addi R5, R0, 100        //should not reach here
+l_1:
+        bne R0, R0, l_3         //R0 == R0, branch not taken
+        addi R6, R0, 4919       //R6 = 4919
+l_2:
+        beq R0, R0, l_4         //R0=R0, branch taken
+        addi R7, R0, 0x347      //should not reach here
+l_3:
+        addi R8, R0, 0x347      //should not reach here
+l_4:
+        addi R7, R0, 0xd00d     //R7 = 53261
+        
+         
+        

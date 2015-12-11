@@ -1,0 +1,6 @@
+#2) straight-line code where there are dependencies (true and false);
+F2 = 2.0, F3 = 3.0, F4 = 4.0, F5 = 5.0
+
+mult.d F1, F2, F3	//F1 = F2 * F3 = 6.0
+add.d F2, F4, F5	//F2 = F4 * F5 = 20.0	false dependency
+mult.d F6, F2, F1	//F6 = F2 * F1 = 120.0 	true dependency

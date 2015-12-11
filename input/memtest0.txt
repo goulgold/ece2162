@@ -1,0 +1,37 @@
+F5 = 255.0, F6 = 510.0, F7 = 1020.0, F8 = 31020.0
+
+#  Set a base address
+addi   R3, R0, 0x1000           //R3 = 0x1000
+        
+#;; Place a test pattern in memory
+sd     F5, 0(R3)                //MEM[4096] = 255.0
+sd     F6, 4(R3)                //MEM[4100] = 510.0
+sd     F7, 8(R3)                //MEM[4104] = 1020.0
+sd     F8, 12(R3)               //MEM[4108] = 31020.0
+
+ld     F9,  0(R3)               //F9 = 255.0
+ld     F10, 4(R3)               //F10 = 510.0
+ld     F11, 8(R3)               //F11 = 1020.0
+ld     F12, 12(R3)              //F12 = 31020.0
+
+addi  R3, R3, 4                 //R3 = 4100
+sd     F5, 0(R3)                //MEM[4100] = 255.0
+sd     F6, 4(R3)                //MEM[4104] = 510.0
+sd     F7, 8(R3)                //MEM[4108] = 1020.0
+sd     F8, 12(R3)               //MEM[4112] = 31020.0
+
+ld     F13,  -4(R3)             //F13 = MEM[4096] = 255.0
+ld     F14,  0(R3)              //F14 = MEM[4100] = 255.0
+ld     F15,  4(R3)              //F15 = MEM[4104] = 510.0
+ld     F16,  8(R3)              //F16 = MEM[4108] = 1020.0
+               
+#;; Calculate a "checksum" for easy comparison
+add.d    F17, F0, F9            //F17 = 255.0
+add.d    F17, F17, F10          //F17 = 765.0
+add.d    F17, F17, F11          //F17 = 1785.0
+add.d    F17, F17, F12          //F17 = 32805.0
+add.d    F17, F17, F13          //F17 = 33060.0
+add.d    F17, F17, F14          //F17 = 33315.0
+add.d    F17, F17, F15          //F17 = 33825.0
+add.d    F17, F17, F16          //F17 = 34845.0
+        
