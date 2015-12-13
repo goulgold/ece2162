@@ -140,11 +140,55 @@ int issueLS(struct input_instr this_instr, int cycles) {
     TimeTable[table_index].index = table_index;
     table_index++;
 
-// update LSQ
+    // update LSQ
     LSQ.entity[seatLSQ].busy = TRUE;
     LSQ.entity[seatLSQ].finished = FALSE;
     LSQ.entity[seatLSQ].instr_type = this_instr.op;
-// update ROB & RAT
+    LSQ.entity[seatLSQ].stage = ISSUE;
+    LSQ.entity[seatLSQ].cycle = cycles;
+
+    // for both LOAD and STORE instruction
+
+    // update LSQ source
+    if (RAT[this_instr.rs].tag == 0)
+        LSQ.entity[seatLSQ].val_1 = int_RF[this_instr.rs];
+    else if (RAT[this_instr.rs].re_name->finished == TRUE)
+        LSQ.entity[seatLSQ].val_1 = RAT[this_instr.rs].re_name->val;
+    else
+        LSQ.entity[seatLSQ].tag_1 = RAT[this_instr.rs].re_name;
+    // update LSQ target
+    LSQ.entity[seatLSQ].offset = this_instr.rt;
+
+    //updat ROB
+    ROB.entity[ROB.nextfree].busy = TRUE;
+    ROB.entity[ROB.nextfree].finished = FALSE;
+
+
+    // for STORE instruction, if destination data is ready, update ROB to finished in write back
+    // don't update RAT
+    if (this_instr.op == SD) {
+        ROB.entity[ROB.nextfree].store_instr = TRUE;
+        ROB.entity[ROB.nextfree].busy = TRUE;
+        LSQ.entity[seatLSQ].buffer = &ROB.entity[ROB.nextfree];
+        if (RAT[this_instr.rd].tag == 0) {
+            LSQ.entity[seatLSQ].mem_val = float_RF[this_instr.rd - ARF_SIZE];
+            LSQ.entity[seatLSQ].data_ready = TRUE;
+        } else {
+            LSQ.entity[seatLSQ].dst = RAT[this_instr.rd].re_name;
+            LSQ.entity[seatLSQ].data_ready = FALSE;
+        }
+    }
+    //for LOAD instruction, like all other ALU instruction
+    if (this_instr.op == LD) {
+        // update LSQ destination
+        LSQ.entity[seatLSQ].dst = &ROB.entity[ROB.nextfree];
+        // update ROB & RAT
+        RAT[this_instr.rd].tag = 1;
+        RAT[this_instr.rd].re_name = LSQ.entity[seatLSQ].dst;
+        ROB.entity[ROB.nextfree].dst = this_instr.rd;
+        ROB.entity[ROB.nextfree].busy = TRUE;
+        ROB.entity[ROB.nextfree].finished = FALSE;
+    }
 
     return TRUE;
 }
@@ -167,6 +211,10 @@ int hasSeatROB() {
 }
 
 int hasSeatLSQ() {
-    return (LSQ.entity[LSQ.head].busy == FALSE);
+    if (!LSQ.entity[LSQ.head].busy) {
+        return LSQ.head;
+    } else {
+        return -1;
+    }
 }
 

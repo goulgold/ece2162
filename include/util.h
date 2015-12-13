@@ -72,6 +72,8 @@ struct ROB_line {
     float val; // value of result
     int finished; // finished or not
     int busy; // occupied or not
+    int store_instr; // is a store instruction or not;
+    int addr; // for store instruction, where data goes.
 };
 
 struct ROB_ {
@@ -117,6 +119,7 @@ struct ALU_ {
     struct ALU_line *entity;
 };
 
+// Load / Store Queue like Reservation Station
 struct LsQueue_line {
     int busy;
     int finished;
@@ -126,8 +129,11 @@ struct LsQueue_line {
     int alu_type;
     int mem_addr;
     float mem_val;
-    struct ROB_line *dst;
+    int data_ready; // the store val is ready or not
+    struct ROB_line *buffer; // for store instr, where data store in ROB temporarily
+    struct ROB_line *dst; // for load instr, which ROB line data goes, for store instr, where data comes from
     struct ROB_line *tag_1; //base addr
+    int val_1; // base addr
     int offset; // offset addr
     int stage;
     int cycle; // which cycle this stage begins

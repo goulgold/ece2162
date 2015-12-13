@@ -5,6 +5,9 @@
 #include <stdlib.h>
 
 extern struct ALU_ ALU;
+extern struct LsQueue LSQ;
+extern struct timetable_line *TimeTable;
+
 
 int startExecALU(struct RS_line *this_RS,
                  int cycles) {
@@ -56,4 +59,27 @@ int issueComplete(struct RS_line *this_RS, int cycles) {
     } else {
         return FALSE;
     }
+}
+
+int startExecLS(struct LsQueue_line *this_LSQ, int cycles) {
+
+    if (this_LSQ->busy == TRUE &&
+        baseAddrReadyLSQ(this_LSQ) &&
+        this_LSQ->stage == ISSUE) {
+        this_LSQ->mem_addr = this_LSQ->val_1 + this_LSQ->offset;
+        this_LSQ->stage = EXEC;
+        this_LSQ->cycle = cycles;
+        // update TimingTable
+        TimeTable[this_LSQ->ttable_index].exec = cycles;
+        // update ROB of store instr
+        if (this_LSQ->instr_type == SD) {
+            this_LSQ->buffer->addr = this_LSQ->mem_addr;
+        }
+        return TRUE;
+    } else
+        return FALSE;
+}
+
+int baseAddrReadyLSQ(struct LsQueue_line *this_LSQ) {
+    return (this_LSQ->tag_1 == NULL);
 }

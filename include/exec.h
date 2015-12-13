@@ -15,5 +15,12 @@ int dataReadyRS(struct RS_line *this_RS);
 //ISSUE stage is complete (1 cycle has passed.)
 int issueComplete(struct RS_line *this_RS, int cycles);
 
+//execute tail of Load / Store Queue if possible: source is ready
+int startExecLS(struct LsQueue_line *this_LSQ, int cycles);
+
+//base address of this Load / Store Queue is ready
+int baseAddrReadyLSQ(struct LsQueue_line *this_LSQ);
+
+
 
 #endif

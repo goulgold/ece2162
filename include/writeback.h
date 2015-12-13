@@ -11,4 +11,10 @@ int startWback(struct RS_line *this_RS,
 
 // get result from ALU
 float getResultALU(struct RS_line *this_RS);
+
+// Load instruction complete
+int memCompleteLoad(struct LsQueue_line *this_LSQ, int cycles);
+
+// wback load value to RS ROB
+int startWbackLoad(struct LsQueue_line *this_LSQ, int cycles);
 #endif

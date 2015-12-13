@@ -327,7 +327,7 @@ int getInstrline(char *line, struct input_instr *instr_mem, int index) {
     }
     // target
     // ld/store
-    if (pinstr->op > 30000) {
+    if (pinstr->op > 30000) { // load/store
         ret = ret_backup;
         ret = strchr(ret, ' ');
         ret++;

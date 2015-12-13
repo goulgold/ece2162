@@ -1,11 +1,13 @@
 #include "print.h"
 #include "issue.h"
 #include "exec.h"
+#include "mem.h"
 #include "writeback.h"
 #include "commit.h"
 #include "parser.h"
 #include "timingtable.h"
 #include "lsq.h"
+#include "instr.h"
 #include "util.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,7 +59,8 @@ int main(int argc, char **argv) {
     int cycles = 0;
     int PC = 0;
     // CDB
-    int cdb_free = 1;
+    int cdb_free = TRUE;
+    int membus_free = TRUE;
     // whether need next cycle or not
     int done = FALSE;
 
@@ -112,7 +115,34 @@ int main(int argc, char **argv) {
                 startWback(this_RS, cycles);
             }
         }
+
+        // start writeback Load / Store instruction
+        for (int i = 0; i < LSQ.size; ++i) {
+            struct LsQueue_line *this_LSQ = &LSQ.entity[i];
+            // Load instruction
+            if (this_LSQ->instr_type == LD && memCompleteLoad(this_LSQ, cycles) && cdb_free && this_LSQ->stage == MEM) {
+                done = FALSE;
+                cdb_free = FALSE;
+                startWbackLoad(this_LSQ, cycles);
+                membus_free = TRUE;
+            }
+            if (this_LSQ->instr_type == SD && this_LSQ->data_ready == TRUE && this_LSQ->stage == MEM) {
+            // TODO Store instruction
+                done = FALSE;
+                this_LSQ->buffer->val = this_LSQ->mem_val;
+                this_LSQ->buffer->finished = TRUE;
+                this_LSQ->stage = WBACK;
+                this_LSQ->cycle = cycles;
+            }
+        }
         cdb_free = TRUE;
+
+        // Memory stage
+        for (int i = 0; i < LSQ.size; ++i) {
+            if (membus_free == TRUE && dataReadyLSQ(&LSQ.entity[i])) {
+                startMemLSQ(&LSQ.entity[i], cycles, &membus_free);
+            }
+        }
 
         // 4.2 start exec stage
         // Requirement:
@@ -122,6 +152,11 @@ int main(int argc, char **argv) {
         for (int i = 0; i < RS.size; ++i) {
             struct RS_line *this_RS = &RS.entity[i];
             startExecALU(this_RS, cycles);
+        }
+
+        // 4.3 start exec load / store instruction
+        for (int i = 0; i < LSQ.size; ++i) {
+            startExecLS(&LSQ.entity[i], cycles);
         }
 
         // 4.1 ISSUE to RS
@@ -136,6 +171,8 @@ int main(int argc, char **argv) {
                 }
             } else if(isLSIns(this_instr)) {
                 if (issueLS(this_instr, cycles)) {
+                    ROB.nextfree = (ROB.nextfree + 1 + ROB.size) % ROB.size;
+                    LSQ.head = (LSQ.head + 1) % LSQ.size;
                     PC++;
                 }
             } else {
