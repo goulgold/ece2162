@@ -55,6 +55,7 @@ int startWback(struct RS_line *this_RS,
     for (int i = 0; i <  LSQ.size; ++i) {
         if (LSQ.entity[i].instr_type == SD && LSQ.entity[i].dst == this_RS->dst) {
             LSQ.entity[i].mem_val = result;
+            LSQ.entity[i].data_ready = TRUE;
             LSQ.entity[i].dst = NULL;
         }
         if (LSQ.entity[i].tag_1 == this_RS->dst) {
@@ -98,7 +99,7 @@ float getResultALU(struct RS_line *this_RS) {
 
 int memCompleteLoad(struct LsQueue_line *this_LSQ, int cycles) {
     return (this_LSQ->stage == MEM &&
-            this_LSQ->cycle - cycles >= this_LSQ->mem_cycle);
+            cycles - this_LSQ->cycle >= this_LSQ->mem_cycle);
 }
 
 int startWbackLoad(struct LsQueue_line *this_LSQ, int cycles) {
@@ -109,11 +110,6 @@ int startWbackLoad(struct LsQueue_line *this_LSQ, int cycles) {
     this_LSQ->dst->finished = TRUE;
     //update timing table
     startWBtable(this_LSQ->ttable_index, cycles);
-    //update LSQ to free
-    this_LSQ->busy = FALSE;
-    this_LSQ->finished = FALSE;
-    this_LSQ->data_ready = FALSE;
-    this_LSQ->stage = WBACK;
     //update all other RS
     for (int i = 0; i < RS.size; ++i) {
         if (RS.entity[i].tag_1 == this_LSQ->dst) {
@@ -133,9 +129,13 @@ int startWbackLoad(struct LsQueue_line *this_LSQ, int cycles) {
     for (int i = 0; i < LSQ.size; ++i) {
         if (LSQ.entity[i].instr_type == SD && LSQ.entity[i].dst == this_LSQ->dst) {
             LSQ.entity[i].mem_val = this_LSQ->mem_val;
+            LSQ.entity[i].buffer->val = this_LSQ->mem_val;
+            LSQ.entity[i].buffer->finished = TRUE;
             LSQ.entity[i].data_ready = TRUE;
             LSQ.entity[i].dst = NULL;
         }
     }
+    //update LSQ to free
+    resetLSQ_line(this_LSQ);
     return TRUE;
 }

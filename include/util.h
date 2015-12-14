@@ -4,13 +4,14 @@
 /*
  * Some Configurations.
  */
-#define MEM_SIZE 1000
+#define MEM_SIZE 50
 #define ARF_SIZE 32
 #define MAX_ALU 16 // supported maximum kind of alu
 #define MAX_DISPLAY 8 // in printStatus, maximum size of one line
 
 #define FALSE 0
 #define TRUE 1
+#define NULL 0
 
 // RS LSQ Stage
 #define FREE 0
@@ -74,6 +75,7 @@ struct ROB_line {
     int busy; // occupied or not
     int store_instr; // is a store instruction or not;
     int addr; // for store instruction, where data goes.
+    struct LsQueue_line* store_q; // for store instruction, which LSQ_line belongs to.
 };
 
 struct ROB_ {
@@ -161,5 +163,8 @@ int isSubInstr(int op);
 
 // given a instruction, get ALU type
 int instr2ALUtype(struct input_instr this_instr);
+
+// reset a LSQ_line
+int resetLSQ_line (struct LsQueue_line *this_LSQ);
 
 #endif

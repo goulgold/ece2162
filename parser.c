@@ -259,7 +259,7 @@ int getMem(char *line, float *data_mem) {
         ret = strchr(ret, '=');
         ret++;
         val = getNumf(ret, 0);
-        data_mem[index / 4] = val;
+        data_mem[index] = val;
         ret = strstr(ret, "Mem");
     }
     return TRUE;

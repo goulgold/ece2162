@@ -66,7 +66,7 @@ int startExecLS(struct LsQueue_line *this_LSQ, int cycles) {
     if (this_LSQ->busy == TRUE &&
         baseAddrReadyLSQ(this_LSQ) &&
         this_LSQ->stage == ISSUE) {
-        this_LSQ->mem_addr = this_LSQ->val_1 + this_LSQ->offset;
+        this_LSQ->mem_addr = (this_LSQ->val_1 + this_LSQ->offset);
         this_LSQ->stage = EXEC;
         this_LSQ->cycle = cycles;
         // update TimingTable

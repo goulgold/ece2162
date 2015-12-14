@@ -168,7 +168,9 @@ int issueLS(struct input_instr this_instr, int cycles) {
     // don't update RAT
     if (this_instr.op == SD) {
         ROB.entity[ROB.nextfree].store_instr = TRUE;
+        ROB.entity[ROB.nextfree].store_q = &LSQ.entity[seatLSQ];
         ROB.entity[ROB.nextfree].busy = TRUE;
+        ROB.entity[ROB.nextfree].ttable_index = LSQ.entity[seatLSQ].ttable_index;
         LSQ.entity[seatLSQ].buffer = &ROB.entity[ROB.nextfree];
         if (RAT[this_instr.rd].tag == 0) {
             LSQ.entity[seatLSQ].mem_val = float_RF[this_instr.rd - ARF_SIZE];

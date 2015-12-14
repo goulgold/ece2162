@@ -1,6 +1,6 @@
 #3) straight-line code where there are forwarding among load/store instructions;
 R2 = 2, R3 = 2
-MEM[4] = 20.0
+Mem[4] = 20.0
 
 add R1, R2, R3	//R1 = 4
 ld F4, 0(R1)	//F4 = MEM[4] = 20.0

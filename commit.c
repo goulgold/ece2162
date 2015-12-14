@@ -22,7 +22,9 @@ int startCommit(struct ROB_line *this_ROB,
     startCOMMITtable(this_ROB->ttable_index, cycles);
     //update ROB
     if (this_ROB->store_instr == TRUE) {
+        // update LSQ to free
         data_mem[this_ROB->addr] = this_ROB->val;
+        resetLSQ_line(this_ROB->store_q);
     } else {
         // update RAT
         RAT[this_ROB->dst].tag = 0;

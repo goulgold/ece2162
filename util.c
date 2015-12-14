@@ -66,3 +66,21 @@ int instr2ALUtype(struct input_instr this_instr) {
     return result;
 }
 
+int resetLSQ_line (struct LsQueue_line *this_LSQ) {
+    this_LSQ->busy = FALSE;
+    this_LSQ->finished = FALSE;
+    this_LSQ->instr_type = 0;
+    this_LSQ->alu_type = 0;
+    this_LSQ->mem_addr = 0;
+    this_LSQ->mem_val = 0;
+    this_LSQ->data_ready = FALSE;
+    this_LSQ->buffer = NULL;
+    this_LSQ->dst = NULL;
+    this_LSQ->tag_1 = NULL;
+    this_LSQ->val_1 = 0;
+    this_LSQ->offset = 0;
+    this_LSQ->stage = 0;
+    this_LSQ->cycle = 0;
+    this_LSQ->ttable_index = 0;
+    return TRUE;
+}
