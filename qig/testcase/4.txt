@@ -1,0 +1,6 @@
+F1 = 1.414, F3 = 2.0
+
+mult.d F2, F1, F1	//F2 = 1.999396 
+mult.d F8, F3, F3	//F8 = 4.0	alu hazard
+mult.d F9, F1, F3	//F9 = 2.828 reservation station hazard
+mult.d F10, F8, F9	//F10 = 11.312

@@ -1,0 +1,10 @@
+        addi R2, R0, 10         //R2 = 10
+        addi R5, R0, 1          //R5 = 1
+        bne R2, R5, 2         //R2 != R5, branch taken
+        addi R10, R0, 3840      //should not reach here
+        addi R5, R0, 100        //should not reach here
+        addi R6, R0, 4919       //R6 = 4919
+        beq R0, R0, 2         //R0=R0, branch taken
+        addi R7, R0, 347      //should not reach here
+        addi R8, R0, 347      //should not reach here
+        addi R7, R0, 333     //R7 = 53261

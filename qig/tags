@@ -1,0 +1,153 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ADD	include/instr.h	14;"	d
+ADDI	include/instr.h	16;"	d
+ADD_D	include/instr.h	15;"	d
+ALU_	include/util.h	/^struct ALU_ {$/;"	s
+ALU_ADDD	include/util.h	27;"	d
+ALU_ADDI	include/util.h	24;"	d
+ALU_DIVD	include/util.h	29;"	d
+ALU_DIVI	include/util.h	26;"	d
+ALU_MULD	include/util.h	28;"	d
+ALU_MULI	include/util.h	25;"	d
+ALU_line	include/util.h	/^struct ALU_line {$/;"	s
+ARF_SIZE	include/util.h	8;"	d
+BEQ	include/instr.h	31;"	d
+BNE	include/instr.h	32;"	d
+CC	Makefile	/^	CC=clang$/;"	m
+CC	Makefile	/^	CC=gcc$/;"	m
+CC_FLAGS	Makefile	/^CC_FLAGS = -g -std=c99 -Wall -O0$/;"	m
+COMMIT	include/util.h	20;"	d
+DIV	include/instr.h	24;"	d
+DIV_D	include/instr.h	25;"	d
+EXEC	include/util.h	18;"	d
+FALSE	include/util.h	12;"	d
+FREE	include/util.h	16;"	d
+HEAD_FILES	Makefile	/^HEAD_FILES = $(wildcard ${INCLUDE_DIR}\/*.h)$/;"	m
+INCLUDE_DIR	Makefile	/^INCLUDE_DIR = .\/include$/;"	m
+INSTR_H_	include/instr.h	2;"	d
+ISSUE	include/util.h	17;"	d
+L	include/instr.h	39;"	d
+LD	include/instr.h	38;"	d
+LOAD_STORE	include/util.h	30;"	d
+MAX_ALU	include/util.h	9;"	d
+MAX_DISPLAY	include/util.h	10;"	d
+MAX_TTABLE_LINE	include/timingtable.h	4;"	d
+MEM_SIZE	include/util.h	7;"	d
+MULT	include/instr.h	22;"	d
+MULT_D	include/instr.h	23;"	d
+OBJ_FILES	Makefile	/^OBJ_FILES = $(patsubst %.c,%.o,${SOURCE_FILES})$/;"	m
+OSNAME	Makefile	/^OSNAME= $(shell uname)$/;"	m
+PARSER_H_	include/parser.h	2;"	d
+PARSER_H_	include/template.h	2;"	d
+PROGRAM	Makefile	/^PROGRAM = simulator$/;"	m
+Parse_File	upper.c	/^int Parse_File(char *input_file_name,$/;"	f
+RAT_line	include/util.h	/^struct RAT_line {$/;"	s
+ROB_	include/util.h	/^struct ROB_ {$/;"	s
+ROB_empty	upper.c	/^int ROB_empty(struct ROB_line *ROB, int ROB_size) {$/;"	f
+ROB_line	include/util.h	/^struct ROB_line {$/;"	s
+RS_	include/util.h	/^struct RS_ {$/;"	s
+RS_line	include/util.h	/^struct RS_line {$/;"	s
+S	include/instr.h	41;"	d
+SD	include/instr.h	40;"	d
+SOURCE_FILES	Makefile	/^SOURCE_FILES = $(wildcard *.c)$/;"	m
+SUB	include/instr.h	18;"	d
+SUBI	include/instr.h	20;"	d
+SUB_D	include/instr.h	19;"	d
+TIMETABLE_H_	include/timingtable.h	2;"	d
+TRUE	include/util.h	13;"	d
+TimeTable	timingtable.c	/^struct timetable_line *TimeTable;$/;"	v	typeref:struct:timetable_line
+UPPER_H_	include/upper.h	2;"	d
+UTIL_H_	include/util.h	2;"	d
+WBACK	include/util.h	19;"	d
+alu_index	include/util.h	/^    int alu_index; \/\/ use which alu to exec$/;"	m	struct:RS_line
+alu_type	include/util.h	/^    int alu_type; \/\/ same as ALU_line$/;"	m	struct:RS_line
+busy	include/util.h	/^    int busy; \/\/ occupied or not$/;"	m	struct:ROB_line
+busy	include/util.h	/^    int busy; \/\/ this ALU is busy or not$/;"	m	struct:ALU_line
+busy	include/util.h	/^    int busy;$/;"	m	struct:RS_line
+commit	include/timingtable.h	/^    int commit; \/\/ cycle start commit$/;"	m	struct:timetable_line
+cycles	include/util.h	/^    int cycles; \/\/ start cycles of this stage;$/;"	m	struct:RS_line
+dataReadyRS	lower.c	/^int dataReadyRS(struct RS_line *this_RS) {$/;"	f
+dst	include/util.h	/^    int dst; \/\/ index of ARF (start from 1)$/;"	m	struct:ROB_line
+dst	include/util.h	/^    struct ROB_line *dst; \/\/destination$/;"	m	struct:RS_line	typeref:struct:RS_line::ROB_line
+entity	include/util.h	/^    struct ALU_line *entity;$/;"	m	struct:ALU_	typeref:struct:ALU_::ALU_line
+entity	include/util.h	/^    struct ROB_line *entity;$/;"	m	struct:ROB_	typeref:struct:ROB_::ROB_line
+entity	include/util.h	/^    struct RS_line *entity;$/;"	m	struct:RS_	typeref:struct:RS_::RS_line
+exeCompleteALU	upper.c	/^int exeCompleteALU(struct RS_line *this_RS, struct ALU_ ALU, int cycles) {$/;"	f
+exec	include/timingtable.h	/^    int exec; \/\/ cycle start exec$/;"	m	struct:timetable_line
+exec_cycle	include/util.h	/^    int exec_cycle; \/\/ how much cycles exec takes$/;"	m	struct:ALU_line
+finished	include/util.h	/^    int finished; \/\/ finished or not$/;"	m	struct:ROB_line
+getALUtype	lower.c	/^int getALUtype(char *line) {$/;"	f
+getExcyc	lower.c	/^int getExcyc(char *line) {$/;"	f
+getFRF	lower.c	/^int getFRF(char *line, float *float_RF) {$/;"	f
+getFunum	lower.c	/^int getFunum(char *line) {$/;"	f
+getIRF	lower.c	/^int getIRF(char *line, int *int_RF) {$/;"	f
+getInstrline	lower.c	/^int getInstrline(char *line, struct input_instr *instr_mem, int index) {$/;"	f
+getMem	lower.c	/^int getMem(char *line, float *data_mem) {$/;"	f
+getMemcyc	lower.c	/^int getMemcyc(char *line) {$/;"	f
+getNum	lower.c	/^int getNum(char *string, int offset) {$/;"	f
+getNumf	lower.c	/^float getNumf(char *string, int offset) {$/;"	f
+getRF	lower.c	/^int getRF(char *line, int *int_RF, float *float_RF) {$/;"	f
+getResultALU	lower.c	/^float getResultALU(struct RS_line *this_RS) {$/;"	f
+getRsnum	lower.c	/^int getRsnum(char *line) {$/;"	f
+hasSeatALU	lower.c	/^int hasSeatALU(struct RS_line *this_RS, struct ALU_ ALU) {$/;"	f
+hasSeatROB	lower.c	/^int hasSeatROB(struct ROB_ ROB) {$/;"	f
+hasSeatRS	lower.c	/^int hasSeatRS(struct input_instr this_instr, struct RS_ RS) {$/;"	f
+has_instr	upper.c	/^int has_instr(struct input_instr *instr_array, int PC) {$/;"	f
+index	include/timingtable.h	/^    int index; \/\/ index # in table$/;"	m	struct:timetable_line
+index	include/util.h	/^    int index; \/\/ index of ROB (start from 1)$/;"	m	struct:ROB_line
+input_instr	include/util.h	/^struct input_instr {$/;"	s
+instr2ALUtype	lower.c	/^int instr2ALUtype(struct input_instr this_instr) {$/;"	f
+instr_addr	include/util.h	/^    int instr_addr; \/\/ which instr is loaded.$/;"	m	struct:RS_line
+instr_type	include/util.h	/^    int instr_type; \/\/ same as instr.h$/;"	m	struct:RS_line
+isALUIns	upper.c	/^int isALUIns(struct input_instr this_instr) {$/;"	f
+isFloatInstr	lower.c	/^int isFloatInstr(int op) {$/;"	f
+isSubInstr	lower.c	/^int isSubInstr(int op) {$/;"	f
+issue	include/timingtable.h	/^    int issue; \/\/ cycle start issue$/;"	m	struct:timetable_line
+issueALU	upper.c	/^int issueALU(struct input_instr this_instr,$/;"	f
+issueComplete	lower.c	/^int issueComplete(struct RS_line *this_RS, int cycles) {$/;"	f
+main	main.c	/^int main(int argc, char **argv) {$/;"	f
+mem	include/timingtable.h	/^    int mem; \/\/ cycle start mem$/;"	m	struct:timetable_line
+mem_addr	include/util.h	/^    int mem_addr; \/\/for load\/store instr$/;"	m	struct:RS_line
+mem_cycle	include/util.h	/^    int mem_cycle; \/\/ how much cycles mem takes$/;"	m	struct:ALU_line
+nextcommit	include/util.h	/^    int nextcommit;$/;"	m	struct:ROB_
+nextfree	include/util.h	/^    int nextfree;$/;"	m	struct:ROB_
+notFinishROB	upper.c	/^int notFinishROB(struct ROB_line *this_ROB) {$/;"	f
+op	include/util.h	/^    int op; \/\/ instruction name. more details in instr.h$/;"	m	struct:input_instr
+printPointROB	lower.c	/^void printPointROB(struct ROB_line *this_ROB) {$/;"	f
+printStatus	upper.c	/^int printStatus(struct input_instr *instr_mem,$/;"	f
+printTimetable	timingtable.c	/^int printTimetable() {$/;"	f
+rd	include/util.h	/^    int rd; \/\/ destination register$/;"	m	struct:input_instr
+re_name	include/util.h	/^    struct ROB_line *re_name; \/\/ reference to ROB if tag = 2$/;"	m	struct:RAT_line	typeref:struct:RAT_line::ROB_line
+readyCommitROB	upper.c	/^int readyCommitROB(struct ROB_line this_ROB) {$/;"	f
+rs	include/util.h	/^    int rs; \/\/ source register$/;"	m	struct:input_instr
+rt	include/util.h	/^    int rt; \/\/ target register or immediate$/;"	m	struct:input_instr
+size	include/util.h	/^    int size;$/;"	m	struct:ALU_
+size	include/util.h	/^    int size;$/;"	m	struct:ROB_
+size	include/util.h	/^    int size;$/;"	m	struct:RS_
+stage	include/util.h	/^    int stage; \/\/ 1:issue 2: exec; 3: write; 4:commit$/;"	m	struct:RS_line
+startCOMMITtable	timingtable.c	/^int startCOMMITtable(int index, int cycle) {$/;"	f
+startCommit	upper.c	/^int startCommit(struct ROB_line *this_ROB,$/;"	f
+startEXECtable	timingtable.c	/^int startEXECtable(int index, int cycle) {$/;"	f
+startExecALU	upper.c	/^int startExecALU(struct RS_line *this_RS,$/;"	f
+startISSUEtable	timingtable.c	/^int startISSUEtable(int index, int cycle) {$/;"	f
+startMEMtable	timingtable.c	/^int startMEMtable(int index, int cycle) {$/;"	f
+startWBtable	timingtable.c	/^int startWBtable(int index, int cycle) {$/;"	f
+startWback	upper.c	/^int startWback(struct RS_line *this_RS,$/;"	f
+table_index	timingtable.c	/^int table_index = 0;$/;"	v
+tag	include/util.h	/^    int tag; \/\/ 0: register file; 1: ROB$/;"	m	struct:RAT_line
+tag_1	include/util.h	/^    struct ROB_line *tag_1; \/\/ source$/;"	m	struct:RS_line	typeref:struct:RS_line::ROB_line
+tag_2	include/util.h	/^    struct ROB_line *tag_2; \/\/target$/;"	m	struct:RS_line	typeref:struct:RS_line::ROB_line
+timetable_line	include/timingtable.h	/^struct timetable_line {$/;"	s
+ttable_index	include/util.h	/^    int ttable_index; \/\/ timing table index$/;"	m	struct:ROB_line
+ttable_index	include/util.h	/^    int ttable_index; \/\/ timing table index$/;"	m	struct:RS_line
+type	include/util.h	/^    int type; \/\/ which type ALU it is 1: int add\/sub; 2:int mul; 3:int div$/;"	m	struct:ALU_line
+val	include/util.h	/^    float val; \/\/ value of result$/;"	m	struct:ROB_line
+val_1	include/util.h	/^    float val_1; \/\/ source$/;"	m	struct:RS_line
+val_2	include/util.h	/^    float val_2; \/\/ target$/;"	m	struct:RS_line
+valid	include/util.h	/^    int valid; \/\/ because instuction buffer is constructed by this struct, thus$/;"	m	struct:input_instr
+wb	include/timingtable.h	/^    int wb; \/\/ cycle start write back$/;"	m	struct:timetable_line
