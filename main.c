@@ -30,6 +30,7 @@ struct pipe_state pipe;
 int PC;
 buffer_t btb[BTB_SIZE];
 int stall_commit; // commit stage is stall or not
+int stall_issue; //if prediction wrong, stall issue
 
 
 
@@ -73,6 +74,7 @@ int main(int argc, char **argv) {
     PC = 0;
     pipe.branch_index = -1;
     stall_commit = FALSE;
+    stall_issue = FALSE;
     // CDB
     int cdb_free = TRUE;
     int membus_free = TRUE;
@@ -109,7 +111,7 @@ int main(int argc, char **argv) {
         }
 
         //handle pipeline recover
-        if(pipe.branch_recover){
+        if(pipe.branch_recover && stall_commit){
             /* clear ROB entries */
             memset(ROB.entity, 0, ROB.size * sizeof(struct ROB_line));
             for (int i = 0; i < ROB.size; ++i) {
@@ -144,6 +146,8 @@ int main(int argc, char **argv) {
             // reset bus
             cdb_free = TRUE;
             membus_free = TRUE;
+            stall_issue = FALSE;
+            stall_commit = FALSE;
             continue;
         }
 
@@ -217,7 +221,7 @@ int main(int argc, char **argv) {
         }
 
         // 4.1 ISSUE to RS
-        if (has_instr(PC)) {
+        if (has_instr(PC) && stall_issue == FALSE) {
             done = FALSE;
             struct input_instr this_instr = instr_mem[PC];
             // ALU instructions

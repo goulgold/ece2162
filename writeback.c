@@ -10,6 +10,7 @@ extern struct LsQueue LSQ;
 extern struct pipe_state pipe;
 extern buffer_t btb[BTB_SIZE];
 extern int stall_commit;
+extern int stall_issue;
 
 void pipe_recover(uint32_t dest)
 {
@@ -53,6 +54,7 @@ int startWback(struct RS_line *this_RS,
         if (((this_RS->predicted_dir != this_RS->branch_taken) ||
                 ((btb[BTB_IDX(this_RS->pc)].valid == 0) ||
                 (btb[BTB_IDX(this_RS->pc)].tag != this_RS->pc)))){
+            stall_issue = TRUE;
             if (this_RS->branch_taken == 1)
                 pipe_recover(this_RS->branch_dest);
             else
