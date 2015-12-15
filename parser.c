@@ -267,6 +267,7 @@ int getMem(char *line, float *data_mem) {
 
 int getInstrline(char *line, struct input_instr *instr_mem, int index) {
     struct input_instr * pinstr = &instr_mem[index];
+    strcpy(pinstr->instr_line, line);
     if (strstr(line, "ld ") != NULL)
         pinstr->op = LD;
     else if(strstr(line, "add ") != NULL)
@@ -289,6 +290,8 @@ int getInstrline(char *line, struct input_instr *instr_mem, int index) {
         pinstr->op = SD;
     else if(strstr(line, "bne ") != NULL)
         pinstr->op = BNE;
+    else if(strstr(line, "beq ") != NULL)
+        pinstr->op = BEQ;
     else
         return FALSE;
     char *ret;

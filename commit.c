@@ -5,6 +5,8 @@ extern struct RAT_line *RAT;
 extern int *int_RF;
 extern float *float_RF;
 extern float *data_mem;
+extern struct ROB_ ROB;
+extern struct pipe_state pipe;
 
 
 int readyCommitROB(struct ROB_line this_ROB) {

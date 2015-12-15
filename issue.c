@@ -2,6 +2,7 @@
 #include "instr.h"
 #include "timingtable.h"
 #include <stdlib.h>
+#include <string.h>
 
 extern struct timetable_line *TimeTable;
 extern int table_index;
@@ -13,6 +14,9 @@ extern struct ROB_ ROB;
 extern struct RAT_line *RAT;
 extern int *int_RF;
 extern float *float_RF;
+extern int PC;
+extern buffer_t btb[BTB_SIZE];
+struct pipe_state pipe;
 
 
 int has_instr(int PC) {
@@ -25,6 +29,10 @@ int has_instr(int PC) {
 
 int isALUIns(struct input_instr this_instr) {
     return (this_instr.op < BEQ);
+}
+
+int isBranchIns(struct input_instr this_instr){
+    return (this_instr.op == BNE || this_instr.op == BEQ);
 }
 
 int isLSIns(struct input_instr this_instr) {
@@ -42,6 +50,7 @@ int issueALU(struct input_instr this_instr, int cycles) {
     startISSUEtable(table_index, cycles);
     RS.entity[seatRS].ttable_index = table_index;
     TimeTable[table_index].index = table_index;
+    strcpy(TimeTable[table_index].instr_line, this_instr.instr_line);
     table_index++;
 
     // allocate RS information
@@ -127,6 +136,98 @@ int issueALU(struct input_instr this_instr, int cycles) {
     return TRUE;
 }
 
+uint32_t prediction(struct input_instr this_instr, int seatRS)
+{
+    uint32_t branch_pc = PC;
+    if((btb[BTB_IDX(branch_pc)].tag != branch_pc) ||
+            (btb[BTB_IDX(branch_pc)].valid == 0)){
+        RS.entity[seatRS].predicted_dest = branch_pc + 1;
+        return 0;
+    }else if((btb[BTB_IDX(branch_pc)].tag == branch_pc) &&
+            (btb[BTB_IDX(branch_pc)].valid == 1)){
+        RS.entity[seatRS].predicted_dest = btb[BTB_IDX(branch_pc)].target;
+        return 1;
+    }
+    RS.entity[seatRS].predicted_dest = branch_pc + 1;
+    return 0;
+}
+
+int issueBranch(struct input_instr this_instr, int cycles) {
+    int seatRS = hasSeatRS(this_instr);
+
+    //can't issue
+    if (seatRS == -1 || !hasSeatROB(ROB))
+        return FALSE;
+
+    // update timing table
+    startISSUEtable(table_index, cycles);
+    RS.entity[seatRS].ttable_index = table_index;
+    TimeTable[table_index].index = table_index;
+    strcpy(TimeTable[table_index].instr_line, this_instr.instr_line);
+    table_index++;
+
+    // allocate RS information
+    RS.entity[seatRS].instr_type = this_instr.op;
+    RS.entity[seatRS].busy = TRUE;
+    RS.entity[seatRS].stage = ISSUE;
+    RS.entity[seatRS].cycles = cycles;
+    RS.entity[seatRS].is_branch = TRUE;
+
+    // allocate RS source
+    if (RAT[this_instr.rd].tag == 0) {
+        RS.entity[seatRS].val_1 = int_RF[this_instr.rd];
+        RS.entity[seatRS].tag_1 = NULL;
+    } else {
+        RS.entity[seatRS].tag_1 = RAT[this_instr.rd].re_name;
+    }
+
+    if (RAT[this_instr.rs].tag == 0) {
+        RS.entity[seatRS].val_2 = int_RF[this_instr.rs];
+        RS.entity[seatRS].tag_2 = NULL;
+    } else {
+        RS.entity[seatRS].tag_2 = RAT[this_instr.rs].re_name;
+    }
+
+    // update ROB commit marker
+    if(pipe.branch_index == -1){
+        pipe.branch_index = ROB.nextfree;
+    }else{
+        pipe.branch_unresovled = ROB.nextfree;
+    }
+    // update branch information
+    RS.entity[seatRS].offset = this_instr.rt;
+    // branch prediction
+    RS.entity[seatRS].predicted_dir = prediction(this_instr, seatRS);
+    RS.entity[seatRS].pc = PC;
+    RS.entity[seatRS].branch_dest = RS.entity[seatRS].pc + 1 + RS.entity[seatRS].offset;
+    PC = RS.entity[seatRS].predicted_dest;
+
+    // update tag_1 and tag_2 if data is ready
+    struct RS_line *this_RS = &RS.entity[seatRS];
+    if (this_RS->tag_1 != NULL && this_RS->tag_1->finished == TRUE) {
+         float val = this_RS->tag_1->val;
+         if (isSubInstr(this_RS->instr_type)) {
+             this_RS->val_1 = (-1.0)*val;
+             this_RS->tag_1 = NULL;
+         } else {
+             this_RS->val_1 = val;
+             this_RS->tag_1 = NULL;
+         }
+    }
+    if (this_RS->tag_2 != NULL && this_RS->tag_2->finished == TRUE) {
+         float val = this_RS->tag_2->val;
+         if (isSubInstr(this_RS->instr_type)) {
+             this_RS->val_2 = (-1.0)*val;
+             this_RS->tag_2 = NULL;
+         } else {
+             this_RS->val_2 = val;
+             this_RS->tag_2 = NULL;
+         }
+    }
+
+    return TRUE;
+}
+
 int issueLS(struct input_instr this_instr, int cycles) {
 // TODO
 // can issue or not
@@ -138,6 +239,7 @@ int issueLS(struct input_instr this_instr, int cycles) {
     startISSUEtable(table_index, cycles);
     LSQ.entity[seatLSQ].ttable_index = table_index;
     TimeTable[table_index].index = table_index;
+    strcpy(TimeTable[table_index].instr_line, this_instr.instr_line);
     table_index++;
 
     // update LSQ

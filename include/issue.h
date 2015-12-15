@@ -11,8 +11,14 @@ int issueALU(struct input_instr this_instr, int cycles);
 // issue instr into LSQ, update ROB, RAT, TimingTable
 int issueLS(struct input_instr this_instr, int cycles);
 
+// issue a branch instr
+int issueBranch(struct input_instr this_instr, int cycles);
+
 // this instruction is normal or not.
 int isALUIns(struct input_instr this_instr);
+
+// this instruction is branch instr or not.
+int isBranchIns(struct input_instr this_instr);
 
 // this instruction is load store instruction
 int isLSIns(struct input_instr this_instr);

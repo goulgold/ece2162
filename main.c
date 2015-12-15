@@ -26,6 +26,11 @@ float *data_mem;
 float *RF;
 int *int_RF;
 float *float_RF;
+struct pipe_state pipe;
+int PC;
+buffer_t btb[BTB_SIZE];
+int stall_commit; // commit stage is stall or not
+
 
 
 int main(int argc, char **argv) {
@@ -34,7 +39,9 @@ int main(int argc, char **argv) {
     //
     if (argc != 3) {
         printf("Usage: %s <input_file> <global configuration file>\n", argv[0]);
-        exit(1);
+        argv[1] = "testcase/b1.txt";
+        argv[2] = "testcase/global.conf";
+        //exit(1);
     }
     // 1.1 Initialize all parameters and allocate memory, (some memory are allocated in Parse_File())
     char *input_file_name = argv[1];
@@ -56,8 +63,16 @@ int main(int argc, char **argv) {
     RAT = (struct RAT_line *) malloc(2 * ARF_SIZE * sizeof(struct RAT_line));
     memset(RAT, 0, 2 * ARF_SIZE * sizeof(struct RAT_line));
 
+    for (int i=0; i<BTB_SIZE; i++){
+        btb[i].valid=0;
+        btb[i].tag=0;
+        btb[i].target=0;
+    }
+
     int cycles = 0;
-    int PC = 0;
+    PC = 0;
+    pipe.branch_index = -1;
+    stall_commit = FALSE;
     // CDB
     int cdb_free = TRUE;
     int membus_free = TRUE;
@@ -93,12 +108,51 @@ int main(int argc, char **argv) {
             }
         }
 
+        //handle pipeline recover
+        if(pipe.branch_recover){
+            /* clear ROB entries */
+            memset(ROB.entity, 0, ROB.size * sizeof(struct ROB_line));
+            for (int i = 0; i < ROB.size; ++i) {
+                ROB.entity[i].index = i+1;
+            }
+            ROB.nextfree = 0;
+            ROB.nextcommit = 0;
+
+            /* reset RAT*/
+            memset(RAT, 0, 2 * ARF_SIZE * sizeof(struct RAT_line));
+
+            /* reset RS*/
+            for (int i = 0; i < RS.size; ++i) {
+                resetRS(&RS.entity[i]);
+            }
+
+            //update PC
+            PC = pipe.branch_dest;
+            //update pipeline status
+            pipe.branch_recover = 0;
+            pipe.branch_dest = 0;
+            pipe.branch_index = -1;
+            pipe.branch_unresovled = 0;
+            done = FALSE;
+            // reset ALU
+            for (int i = 0; i < ALU.size; ++i) {
+                ALU.entity[i].busy = FALSE;
+            }
+            // reset LSQ
+            resetLSQ(LSQ);
+            continue;
+        }
+
+
+
+
         //start commit
         //Requirement:
         //next commit header to ROB's is finished
-        if (readyCommitROB(ROB.entity[ROB.nextcommit])) {
+        if (!stall_commit && readyCommitROB(ROB.entity[ROB.nextcommit])) {
             done = FALSE;
             startCommit(&ROB.entity[ROB.nextcommit], cycles);
+            if (ROB.nextcommit == pipe.branch_index) stall_commit = TRUE;
             ROB.nextcommit = (ROB.nextcommit + 1 + ROB.size) % ROB.size;
         }
 
@@ -169,7 +223,9 @@ int main(int argc, char **argv) {
                     ROB.nextfree = (ROB.nextfree + 1 + ROB.size) % ROB.size;
                     PC++;
                 }
-            } else if(isLSIns(this_instr)) {
+            } else if (isBranchIns(this_instr)) {
+                issueBranch(this_instr, cycles);
+            } else if (isLSIns(this_instr)) {
                 if (issueLS(this_instr, cycles)) {
                     ROB.nextfree = (ROB.nextfree + 1 + ROB.size) % ROB.size;
                     LSQ.head = (LSQ.head + 1) % LSQ.size;

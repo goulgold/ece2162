@@ -1,4 +1,5 @@
 #include "util.h"
+#include <string.h>
 #include "instr.h"
 
 int notFinishROB(struct ROB_line *this_ROB) {
@@ -59,11 +60,24 @@ int instr2ALUtype(struct input_instr this_instr) {
         case DIV_D:
             result = ALU_DIVD;
             break;
+        case BEQ:
+            result = ALU_ADDI;
+            break;
+        case BNE:
+            result = ALU_ADDI;
+            break;
         default:
             result = -1;
             break;
     }
     return result;
+}
+
+int resetRS(struct RS_line * this_RS) {
+    int alu_type = this_RS->alu_type;
+    memset(this_RS, 0, sizeof(struct RS_line));
+    this_RS->alu_type = alu_type;
+    return TRUE;
 }
 
 int resetLSQ_line (struct LsQueue_line *this_LSQ) {
@@ -82,5 +96,26 @@ int resetLSQ_line (struct LsQueue_line *this_LSQ) {
     this_LSQ->stage = 0;
     this_LSQ->cycle = 0;
     this_LSQ->ttable_index = 0;
+    return TRUE;
+}
+
+int resetROB_line (struct ROB_line * this_ROB) {
+    this_ROB->ttable_index = 0;
+    this_ROB->dst = 0;
+    this_ROB->val = 0;
+    this_ROB->finished = FALSE;
+    this_ROB->busy = FALSE;
+    this_ROB->store_instr = 0;
+    this_ROB->addr = 0;
+    this_ROB->store_q = NULL;
+    return TRUE;
+}
+
+int resetLSQ (struct LsQueue LSQ) {
+    for (int i = 0; i < LSQ.size; ++i) {
+        resetLSQ_line(&LSQ.entity[i]);
+    }
+    LSQ.head = 0;
+    LSQ.tail = 0;
     return TRUE;
 }

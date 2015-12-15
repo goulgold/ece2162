@@ -59,7 +59,6 @@ int main(int argc, char **argv) {
     RAT = (struct RAT_line *) malloc(2 * ARF_SIZE * sizeof(struct RAT_line));
     memset(RAT, 0, 2 * ARF_SIZE * sizeof(struct RAT_line));
 
-
     for (int i=0; i<BTB_SIZE; i++){
         btb[i].valid=0;
         btb[i].tag=0;

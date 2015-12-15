@@ -5,13 +5,14 @@
 /*
  * Some Configurations.
  */
-#define MEM_SIZE 1000
+#define MEM_SIZE 50
 #define ARF_SIZE 32
 #define MAX_ALU 16 // supported maximum kind of alu
 #define MAX_DISPLAY 8 // in printStatus, maximum size of one line
 
 #define FALSE 0
 #define TRUE 1
+#define NULL 0
 
 // RS LSQ Stage
 #define FREE 0

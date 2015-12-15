@@ -4,6 +4,7 @@
 #define MAX_TTABLE_LINE 100 // timing table size
 
 struct timetable_line {
+    char instr_line[1024];
     int index; // index # in table
     int issue; // cycle start issue
     int exec; // cycle start exec

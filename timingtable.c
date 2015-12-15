@@ -27,10 +27,11 @@ int startCOMMITtable(int index, int cycle) {
     return TRUE;
 }
 int printTimetable() {
-    printf ("index\tissue\texec\tmem\twb\tcommit\n");
+    printf ("line\tindex\tissue\texec\tmem\twb\tcommit\n");
     for (int i = 0; i < MAX_TTABLE_LINE; ++i) {
         if (TimeTable[i].issue != 0) {
-            printf("%d\t%d\t%d\t%d\t%d\t%d\n",
+            printf("%s\t%d\t%d\t%d\t%d\t%d\t%d\n",
+                    TimeTable[i].instr_line,
                     TimeTable[i].index,
                     TimeTable[i].issue,
                     TimeTable[i].exec,

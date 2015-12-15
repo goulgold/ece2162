@@ -1,5 +1,6 @@
 #ifndef UTIL_H_
 #define UTIL_H_
+#include "stdint.h"
 
 /*
  * Some Configurations.
@@ -31,6 +32,10 @@
 #define ALU_DIVD 6 // float divide
 #define LOAD_STORE 7 // load/store unit
 
+#define BTB_IDX(X) (uint32_t) ((X) & (0x7))
+#define BTB_SIZE 8
+
+
 
 /*
  * This head file declares some global data structures and configurations.
@@ -54,6 +59,17 @@ struct RS_line {
     int stage; // 1:issue 2: exec; 3: write; 4:commit
     int cycles; // start cycles of this stage;
     int ttable_index; // timing table index
+
+    uint32_t pc;
+    /* branch information */
+    int offset;
+    int is_branch;
+    uint32_t branch_dest;
+    int branch_taken;
+
+    uint32_t predicted_dir;
+    uint32_t predicted_dest;
+
 };
 
 // Reservation Station
@@ -92,6 +108,8 @@ struct ROB_ {
  */
 // for all operand, float index += ARF_SIZE
 struct input_instr {
+    char instr_line[1024];
+    uint32_t pc;
     int op; // instruction name. more details in instr.h
     int rs; // source register
     int rt; // target register or immediate
@@ -149,6 +167,21 @@ struct LsQueue {
     int size;
 };
 
+struct pipe_state
+{
+    int branch_index;
+    int branch_unresovled;
+    int branch_recover;
+    int branch_dest;
+};
+
+typedef struct buffer_t{
+        uint32_t valid,tag,target;
+
+}buffer_t;
+
+
+
 /* ***************************
  * Some util functions
  * **************************/
@@ -164,7 +197,14 @@ int isSubInstr(int op);
 // given a instruction, get ALU type
 int instr2ALUtype(struct input_instr this_instr);
 
+// reset RS
+int resetRS(struct RS_line * this_RS);
+
 // reset a LSQ_line
 int resetLSQ_line (struct LsQueue_line *this_LSQ);
+
+int resetLSQ ();
+
+int resetROB_line (struct ROB_line * this_ROB);
 
 #endif
