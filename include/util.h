@@ -5,7 +5,7 @@
 /*
  * Some Configurations.
  */
-#define MEM_SIZE 50
+#define MEM_SIZE 2048
 #define ARF_SIZE 32
 #define MAX_ALU 16 // supported maximum kind of alu
 #define MAX_DISPLAY 8 // in printStatus, maximum size of one line

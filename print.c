@@ -29,10 +29,12 @@ int printStatus(int cycles) {
     }
 
     //print Data memory;
+    /*
     printf("Data memory:\n");
     for (int i = 0; i < MEM_SIZE; ++i) {
     printf("%f\n",data_mem[i]);
     }
+    */
 
     //print Reservation Station
     printf ("Reservation Station:\n");

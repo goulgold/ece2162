@@ -140,6 +140,10 @@ int main(int argc, char **argv) {
             }
             // reset LSQ
             resetLSQ(LSQ);
+
+            // reset bus
+            cdb_free = TRUE;
+            membus_free = TRUE;
             continue;
         }
 
@@ -169,14 +173,14 @@ int main(int argc, char **argv) {
                 startWback(this_RS, cycles);
             }
         }
+        cdb_free = TRUE;
 
         // start writeback Load / Store instruction
         for (int i = 0; i < LSQ.size; ++i) {
             struct LsQueue_line *this_LSQ = &LSQ.entity[i];
             // Load instruction
-            if (this_LSQ->instr_type == LD && memCompleteLoad(this_LSQ, cycles) && cdb_free && this_LSQ->stage == MEM) {
+            if (this_LSQ->instr_type == LD && memCompleteLoad(this_LSQ, cycles) && this_LSQ->stage == MEM) {
                 done = FALSE;
-                cdb_free = FALSE;
                 startWbackLoad(this_LSQ, cycles);
                 membus_free = TRUE;
             }
@@ -189,7 +193,6 @@ int main(int argc, char **argv) {
                 this_LSQ->cycle = cycles;
             }
         }
-        cdb_free = TRUE;
 
         // Memory stage
         for (int i = 0; i < LSQ.size; ++i) {
